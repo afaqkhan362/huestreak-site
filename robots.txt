@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://huestreak.com/sitemap.xml
