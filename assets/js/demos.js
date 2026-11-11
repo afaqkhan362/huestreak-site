@@ -4,7 +4,7 @@
 // Tile tokens: R B G Y P = coloured tile, # brick, #1 cracked brick, xR locked red tile, b3R bomb (fuse 3) red, gR8 gold bomb (8 s) red, W rainbow.
 // Steps: { scene }  { wait }  { drag: [[row, col], ...], release? }  { release }  { tick: seconds }  { shuffleTo: rows }   each with a caption.
 
-import { gridFromRows, makeIds, applyChain, tickGold, canExtend, hasMove } from './engine.js?v=8423382c';
+import { gridFromRows, makeIds, applyChain, tickGold, canExtend, hasMove } from './engine.js?v=69b98c11';
 
 const COLOR = { R: 1, B: 2, G: 3, Y: 4, P: 5 };
 
@@ -32,21 +32,13 @@ export const DEMOS = {
       { release: true, caption: 'A Rainbow tile joins any colour' },
     ],
   },
-  shuffle: {
-    label: 'Shuffle when stuck',
-    script: [
-      { scene: { rows: ['R B G R', 'G R B G', 'B G R B'], refill: 'RBG' }, caption: 'No chains left: nothing here can be cleared', wait: 1900 },
-      { shuffleTo: ['R R R G', 'B G G B', 'R B B G'], caption: 'Tap Shuffle to mix the colours' },
-      { drag: [[0, 0], [0, 1], [0, 2]], caption: 'Now there are chains again', release: true },
-    ],
-  },
   bricks: {
-    label: 'Bricks and cracked bricks',
+    label: 'Bricks and locks',
     script: [
       { scene: { rows: ['R R R B', 'G # G B', 'G R R xG', 'B R G G'], refill: 'R' }, caption: 'A brick can never be chained', wait: 1500 },
       { drag: [[0, 0], [0, 1], [0, 2]], caption: 'Clear right next to it: the brick cracks', release: true },
       { drag: [[0, 0], [0, 1], [0, 2]], caption: 'Clear next to it again: it breaks', release: true },
-      { scene: { rows: ['B B B G', 'G xR G R', 'R R R B'], refill: 'R' }, caption: 'A cracked brick only needs one clear', wait: 1300 },
+      { scene: { rows: ['B B B G', 'G xR G R', 'R R R B'], refill: 'R' }, caption: 'A padlock only needs one clear', wait: 1300 },
       { drag: [[0, 0], [0, 1], [0, 2]], caption: 'It opens and frees the tile inside', release: true },
     ],
   },

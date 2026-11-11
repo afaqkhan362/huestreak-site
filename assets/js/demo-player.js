@@ -1,7 +1,7 @@
 // Plays a scripted demo (demos.js) on a Board: a "finger" drags, tiles clear, a caption explains. Loops by itself, only while on screen.
-import { Board } from './board.js?v=8423382c';
-import { DEMOS } from './demos.js?v=8423382c';
-import { gridFromRows, makeIds, applyChain, tickGold, canExtend } from './engine.js?v=8423382c';
+import { Board } from './board.js?v=69b98c11';
+import { DEMOS } from './demos.js?v=69b98c11';
+import { gridFromRows, makeIds, applyChain, tickGold, canExtend } from './engine.js?v=69b98c11';
 
 const COLOR = { R: 1, B: 2, G: 3, Y: 4, P: 5 };
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;

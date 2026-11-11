@@ -1,7 +1,7 @@
 // The board you can see and play. Draws a grid from engine.js tiles, handles drag input, and animates clears, gravity and refills.
 // All colours come from CSS (theme variables); this file never touches a colour.
-import { canExtend, joinable, MIN_CHAIN } from './engine.js?v=8423382c';
-import { tileArt } from './tile-art.js?v=8423382c';
+import { canExtend, joinable, MIN_CHAIN } from './engine.js?v=69b98c11';
+import { tileArt } from './tile-art.js?v=69b98c11';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sleep = (ms) => new Promise((r) => setTimeout(r, reduceMotion() ? Math.min(ms, 30) : ms));

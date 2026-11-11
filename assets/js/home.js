@@ -1,6 +1,6 @@
 // The playable board on the home page: a short taste of the game. A few moves, a few tries, then an invitation to download it.
-import { Board } from './board.js?v=8423382c';
-import { randomGrid, makeIds, mulberry32, applyChain, hasMove, shuffleColors, findHint, streakMultiplier, STREAK_WINDOW_MS, COLORS } from './engine.js?v=8423382c';
+import { Board } from './board.js?v=69b98c11';
+import { randomGrid, makeIds, mulberry32, applyChain, hasMove, shuffleColors, findHint, streakMultiplier, STREAK_WINDOW_MS, COLORS } from './engine.js?v=69b98c11';
 
 const $ = (sel) => document.querySelector(sel);
 const host = $('#hero-board');

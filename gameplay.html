@@ -4,21 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Gameplay · Huestreak</title>
-<meta name="description" content="How Huestreak plays: chains, scoring and streaks, shuffles, bricks, hazard bombs, gold bombs, modes and levels, each with an animated demo.">
+<meta name="description" content="How Huestreak plays: chains, scoring and streaks, Surge, bricks and locks, hazard bombs, gold bombs, modes and levels, each with an animated demo.">
 <link rel="canonical" href="https://huestreak.com/gameplay">
 <meta name="theme-color" content="#0b0b18">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Huestreak">
 <meta property="og:title" content="Gameplay · Huestreak">
-<meta property="og:description" content="How Huestreak plays: chains, scoring and streaks, shuffles, bricks, hazard bombs, gold bombs, modes and levels, each with an animated demo.">
+<meta property="og:description" content="How Huestreak plays: chains, scoring and streaks, Surge, bricks and locks, hazard bombs, gold bombs, modes and levels, each with an animated demo.">
 <meta property="og:url" content="https://huestreak.com/gameplay">
 <meta property="og:image" content="https://huestreak.com/assets/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/tokens.css?v=8423382c">
-<link rel="stylesheet" href="assets/css/themes.css?v=8423382c">
-<link rel="stylesheet" href="assets/css/site.css?v=8423382c">
+<link rel="stylesheet" href="assets/css/tokens.css?v=69b98c11">
+<link rel="stylesheet" href="assets/css/themes.css?v=69b98c11">
+<link rel="stylesheet" href="assets/css/site.css?v=69b98c11">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -59,25 +59,24 @@
     <div class="guide__text">
       <h3>Longer chains, bigger scores</h3>
       <p>Every extra tile makes the whole chain worth more, so one long chain beats several short ones. Chain a long one and you earn a <strong>Rainbow tile</strong>, which joins any colour.</p>
-      <p>Start the next chain quickly to build a <strong>streak multiplier</strong> on top. Start it before the streak window closes and the multiplier steps up; let it close and you begin again. The window gets shorter as the level gets harder, which is what makes Expert so tense.</p>
+      <p>Start the next chain quickly to build a <strong>streak multiplier</strong> on top. Start it before the streak window closes and the multiplier steps up; let it close and you begin again. The window gets shorter as the level gets harder, which is what makes Hard so tense.</p>
     </div>
     <div data-demo="score"></div>
   </section>
 
-  <section class="guide" id="shuffle">
+  <section class="guide" id="surge">
     <div class="guide__text">
-      <h3>Stuck? Shuffle</h3>
-      <p>In <strong>Infinite</strong>, when no chains are left, tap <strong>Shuffle</strong> to mix the colours. The little number on the button is how many you have left.</p>
-      <p>No shuffles left and no moves? That is game over, so use them wisely. Harder levels start with fewer.</p>
+      <h3>Surge: beat the board clock</h3>
+      <p>A clock counts down to the next surge. When it hits zero <strong>every colour reshuffles</strong>, so plan for the new board, not the old one.</p>
+      <p>Tiles ringed in <strong>amber</strong> are marked: if you have not chained them away, they turn into bricks. A <strong>red</strong> mark becomes a hazard bomb. Chaining a marked tile defends it and scores a bonus. Each surge comes a little sooner than the last, and there is no shuffle button: if no chain is left, the run ends.</p>
     </div>
-    <div data-demo="shuffle"></div>
   </section>
 
   <section class="guide" id="bricks">
     <div class="guide__text">
-      <h3>Bricks and cracked bricks</h3>
+      <h3>Bricks and locks</h3>
       <p>A <strong>brick</strong> can never be chained. Clear a chain right next to it <strong>twice</strong> to break it.</p>
-      <p>A <strong>cracked brick</strong> hides a coloured tile. One clear next to it breaks it open and frees the tile inside.</p>
+      <p>A <strong>padlock</strong> hides a coloured tile. One clear next to it opens it and frees the tile inside.</p>
     </div>
     <div data-demo="bricks"></div>
   </section>
@@ -86,7 +85,7 @@
     <div class="guide__text">
       <h3>Hazard bombs</h3>
       <p>Chain a bomb into a clear before its fuse runs out. <strong>Every move uses up one dot</strong>.</p>
-      <p>At zero it explodes and turns the tiles around it into bricks. Bombs land on random tiles, so spot them early and plan a chain.</p>
+      <p>At zero it explodes and turns the tiles around it into bricks. Nothing about a bomb is luck: in Surge it is announced with a red mark first, and in the Daily it lands on the same move for everyone.</p>
     </div>
     <div data-demo="hazard"></div>
   </section>
@@ -94,7 +93,7 @@
   <section class="guide" id="gold">
     <div class="guide__text">
       <h3>Gold bombs</h3>
-      <p>Chain a gold bomb before its timer bar runs out and <strong>every tile of that colour disappears</strong>. The bar gets shorter on harder levels.</p>
+      <p>Chain a gold bomb before its timer bar runs out and <strong>every tile of that colour disappears</strong>. You earn one by chaining five times in a row, and the bar is shorter on Hard.</p>
       <p>Each wiped tile scores like one of the tiles in your chain. Bricks are safe, and if time runs out it simply turns back into a normal tile.</p>
     </div>
     <div data-demo="gold"></div>
@@ -104,16 +103,14 @@
     <div class="section__head">
       <span class="eyebrow">Modes and levels</span>
       <h2>Pick your fight</h2>
-      <p>Blitz is a sprint against the clock where every chain adds time. Infinite lasts until you run out of moves. Daily is one shared board with one try a day.</p>
+      <p>Surge is the main mode: beat the board clock. Blitz is a 60 second sprint where every chain adds time. Daily is one shared board, with the same hazards on the same moves for everyone, and one try a day.</p>
     </div>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Level</th><th>What it is</th></tr></thead>
         <tbody>
-          <tr><td><strong>Beginner</strong></td><td>The classic game with friendly gold bombs</td></tr>
-          <tr><td><strong>Medium</strong></td><td>Bricks and two kinds of bomb</td></tr>
-          <tr><td><strong>Hard</strong></td><td>More bombs and bricks, less time</td></tr>
-          <tr><td><strong>Expert</strong></td><td>Short fuses, short timers. No mercy</td></tr>
+          <tr><td><strong>Easy</strong></td><td>A roomy clock and gentle surges</td></tr>
+          <tr><td><strong>Hard</strong></td><td>A short clock, more bricks and hazard bombs</td></tr>
         </tbody>
       </table>
     </div>
@@ -154,7 +151,7 @@
   </div>
 </footer>
 
-<script type="module" src="assets/js/site.js?v=8423382c"></script>
-<script type="module" src="assets/js/page.js?v=8423382c"></script>
+<script type="module" src="assets/js/site.js?v=69b98c11"></script>
+<script type="module" src="assets/js/page.js?v=69b98c11"></script>
 </body>
 </html>
