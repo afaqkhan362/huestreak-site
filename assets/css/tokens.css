@@ -63,6 +63,10 @@
   --shadow-1: 0 1px 2px rgb(0 0 0 / 0.14), 0 6px 18px rgb(0 0 0 / 0.1);
   --shadow-2: 0 2px 4px rgb(0 0 0 / 0.16), 0 16px 40px rgb(0 0 0 / 0.18);
 
+  /* The game's fixed tile art (same in every theme): a brick wall and the Rainbow tile's dark base */
+  --brick-base: #6b6f7a;
+  --rainbow-base: #1a1a2e;
+
   /* Motion */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --dur-1: 120ms;

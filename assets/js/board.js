@@ -1,6 +1,7 @@
 // The board you can see and play. Draws a grid from engine.js tiles, handles drag input, and animates clears, gravity and refills.
 // All colours come from CSS (theme variables); this file never touches a colour.
-import { canExtend, joinable, MIN_CHAIN } from './engine.js?v=6fdfca0b';
+import { canExtend, joinable, MIN_CHAIN } from './engine.js?v=8423382c';
+import { tileArt } from './tile-art.js?v=8423382c';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sleep = (ms) => new Promise((r) => setTimeout(r, reduceMotion() ? Math.min(ms, 30) : ms));
@@ -104,25 +105,11 @@ export class Board {
     const keep = [...node.classList].filter((c) => c === 'tile' || c === 'tile--spawn' || c === 'is-selected' || c === 'is-clearing' || c === 'is-hint');
     node.className = keep.join(' ');
     node.classList.add(`tile--${tile.kind}`);
-    if (tile.kind === 'brick' && tile.hp === 1) node.classList.add('is-cracked');
-    if (tile.color) node.dataset.c = tile.color; else delete node.dataset.c;
+    // a locked tile hides its colour, exactly like in the game: it is drawn as a cracked brick and carries no colour
+    if (tile.color && tile.kind !== 'locked') node.dataset.c = tile.color; else delete node.dataset.c;
     const face = node.firstElementChild;
-    face.replaceChildren();
-    if (tile.kind === 'bomb') {
-      const fuse = document.createElement('span');
-      fuse.className = 'tile__fuse';
-      const total = Math.max(tile.fuseMax ?? tile.fuse, tile.fuse, 3);
-      for (let i = 0; i < total; i++) { const d = document.createElement('i'); if (i >= tile.fuse) d.dataset.off = 'true'; fuse.append(d); }
-      face.append(fuse);
-    }
-    if (tile.kind === 'gold') {
-      const bar = document.createElement('span');
-      bar.className = 'tile__timer';
-      const fill = document.createElement('i');
-      bar.append(fill);
-      node.style.setProperty('--t', tile.timer / (tile.timerMax || 1));
-      face.append(bar);
-    }
+    const art = tileArt(tile);
+    if (face.dataset.art !== art) { face.innerHTML = art; face.dataset.art = art; }
   }
 
   #cellCenter(r, c) { return { x: (c + 0.5) / this.cols, y: (r + 0.5) / this.rows }; }

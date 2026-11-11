@@ -4,7 +4,7 @@
 // Tile tokens: R B G Y P = coloured tile, # brick, #1 cracked brick, xR locked red tile, b3R bomb (fuse 3) red, gR8 gold bomb (8 s) red, W rainbow.
 // Steps: { scene }  { wait }  { drag: [[row, col], ...], release? }  { release }  { tick: seconds }  { shuffleTo: rows }   each with a caption.
 
-import { gridFromRows, makeIds, applyChain, tickGold, canExtend, hasMove } from './engine.js?v=6fdfca0b';
+import { gridFromRows, makeIds, applyChain, tickGold, canExtend, hasMove } from './engine.js?v=8423382c';
 
 const COLOR = { R: 1, B: 2, G: 3, Y: 4, P: 5 };
 

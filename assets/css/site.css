@@ -183,11 +183,12 @@ a:hover { text-decoration-thickness: 2.5px; }
   transition: transform var(--fall, 0.3s) var(--ease);
 }
 .tile--spawn { transition: none; }
+.tile__face svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; border-radius: inherit; }
 .tile__face {
-  position: absolute; inset: calc(var(--gap) / 2); border-radius: var(--tile-r); background: var(--c);
+  position: absolute; inset: 4.5%; border-radius: 18%; background: var(--c);          /* the game: gap about 9% of a cell, corner radius 18% of the tile */
   box-shadow: inset 0 0 0 1.5px var(--tile-edge);
-  transition: transform 0.18s var(--ease), box-shadow 0.18s, opacity 0.3s;
-  display: grid; place-items: center;
+  transition: transform 0.18s var(--ease), box-shadow 0.18s, opacity 0.3s, background-color 0.25s;
+  overflow: visible;
 }
 .tile[data-c="1"] { --c: var(--tile-1); }
 .tile[data-c="2"] { --c: var(--tile-2); }
@@ -195,41 +196,19 @@ a:hover { text-decoration-thickness: 2.5px; }
 .tile[data-c="4"] { --c: var(--tile-4); }
 .tile[data-c="5"] { --c: var(--tile-5); }
 .tile.is-selected { z-index: 3; }
-.tile.is-selected .tile__face { transform: scale(1.08); box-shadow: 0 0 0 3px var(--glow), 0 0 18px var(--glow); }
+/* the game outlines a selected tile with a white ring; it does not enlarge it */
+.tile.is-selected .tile__face { outline: 3px solid var(--glow); outline-offset: 0.5px; }
 .tile.is-clearing .tile__face { transform: scale(0); opacity: 0; transition: transform 0.32s var(--ease), opacity 0.32s; }
 .tile.is-hint .tile__face { animation: hint 1.1s var(--ease) infinite; }
 @keyframes hint { 50% { transform: scale(1.1); box-shadow: 0 0 0 3px var(--glow); } }
 
-/* Special tiles (same look and meaning as in the game) */
-.tile--brick .tile__face {
-  background:
-    linear-gradient(color-mix(in srgb, var(--bg) 55%, transparent) 0 0) 0 33% / 100% 2px no-repeat,
-    linear-gradient(color-mix(in srgb, var(--bg) 55%, transparent) 0 0) 0 66% / 100% 2px no-repeat,
-    color-mix(in srgb, var(--text) 26%, var(--surface));
-}
-.tile--brick.is-cracked .tile__face::after { content: ""; position: absolute; inset: 0; border-radius: inherit;
-  background: linear-gradient(115deg, transparent 46%, var(--bg) 47% 50%, transparent 51%), linear-gradient(60deg, transparent 56%, var(--bg) 57% 60%, transparent 61%); }
-.tile--locked .tile__face { opacity: var(--locked-opacity); }
-.tile--locked .tile__face::after {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; opacity: 1;
-  background: repeating-linear-gradient(0deg, transparent 0 6px, color-mix(in srgb, var(--bg) 80%, transparent) 6px 9px);
-}
-.tile--bomb .tile__face { box-shadow: inset 0 0 0 1.5px var(--tile-edge), inset 0 0 0 4px color-mix(in srgb, var(--bg) 78%, transparent); }
-.tile__fuse { position: absolute; top: 12%; display: flex; gap: 12%; }
-.tile__fuse i { width: 0.34rem; height: 0.34rem; border-radius: 50%; background: var(--text); box-shadow: 0 0 6px var(--glow); }
-.tile__fuse i[data-off="true"] { opacity: 0.18; box-shadow: none; }
-.tile--gold .tile__face { background: linear-gradient(145deg, color-mix(in srgb, var(--combo) 70%, #fff 30%), var(--combo)); }
-.tile--gold .tile__face::before { content: ""; width: 42%; height: 42%; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--bg) 60%, transparent); }
-.tile__timer { position: absolute; left: 14%; right: 14%; bottom: 12%; height: 4px; border-radius: 3px; background: color-mix(in srgb, var(--bg) 70%, transparent); overflow: hidden; }
-.tile__timer i { display: block; height: 100%; width: calc(var(--t, 1) * 100%); background: var(--bg); transition: width 0.4s linear; }
-.tile--rainbow .tile__face { background: var(--rainbow); }
-.tile--rainbow .tile__face::before { content: ""; position: absolute; inset: 22%; border-radius: 50%;
-  background:
-    radial-gradient(circle at 22% 22%, var(--tile-1) 0 22%, transparent 24%), radial-gradient(circle at 78% 22%, var(--tile-2) 0 22%, transparent 24%),
-    radial-gradient(circle at 22% 78%, var(--tile-3) 0 22%, transparent 24%), radial-gradient(circle at 78% 78%, var(--tile-4) 0 22%, transparent 24%); }
+/* Special tiles are drawn as SVG by tile-art.js with the game's own geometry; only their base colour is set here. */
+.tile--brick .tile__face, .tile--locked .tile__face { background: var(--brick-base); box-shadow: none; }
+.tile--rainbow .tile__face { background: var(--rainbow-base); box-shadow: none; }
+.tile--gold .tile__face, .tile--bomb .tile__face { overflow: visible; }
 
 .board__path { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 4; overflow: visible; }
-.board__path polyline { fill: none; stroke: var(--glow); stroke-width: 0.13; stroke-linecap: round; stroke-linejoin: round; opacity: 0.85; }
+.board__path polyline { fill: none; stroke: var(--glow); stroke-width: 0.13; stroke-linecap: round; stroke-linejoin: round; opacity: 0.6; }
 .pop {
   position: absolute; z-index: 6; pointer-events: none; font-weight: var(--fw-black); font-size: 1.4rem; color: var(--text);
   text-shadow: 0 2px 10px var(--bg), 0 0 2px var(--bg); transform: translate(-50%, -50%); animation: pop 0.95s var(--ease) forwards; white-space: nowrap;
