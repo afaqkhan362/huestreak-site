@@ -1,7 +1,7 @@
 // Plays a scripted demo (demos.js) on a Board: a "finger" drags, tiles clear, a caption explains. Loops by itself, only while on screen.
-import { Board } from './board.js?v=69b98c11';
-import { DEMOS } from './demos.js?v=69b98c11';
-import { gridFromRows, makeIds, applyChain, tickGold, canExtend } from './engine.js?v=69b98c11';
+import { Board } from './board.js?v=a06e3597';
+import { DEMOS, parseScene, surgeGrid } from './demos.js?v=a06e3597';
+import { gridFromRows, makeIds, applyChain, tickGold, canExtend } from './engine.js?v=a06e3597';
 
 const COLOR = { R: 1, B: 2, G: 3, Y: 4, P: 5 };
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -43,7 +43,9 @@ export class DemoPlayer {
   #showFirstFrame() {
     const first = this.demo.script.find((s) => s.scene);
     this.nextId = makeIds(1);
-    this.board.setGrid(gridFromRows(first.scene.rows, this.nextId), { spawn: false });
+    const { grid, marks } = parseScene(first.scene.rows, this.nextId);
+    this.board.marks = marks;
+    this.board.setGrid(grid, { spawn: false });
     this.caption.textContent = first.caption;
     this.stepLabel.textContent = '';
   }
@@ -68,7 +70,7 @@ export class DemoPlayer {
   async #loop(token) {
     while (token === this.run) {
       const total = this.demo.script.length;
-      let grid = null, ctx = null, path = [], refillAt = 0;
+      let grid = null, ctx = null, path = [], refillAt = 0, marks = new Set();
       const refillFrom = (letters) => () => COLOR[letters[refillAt++ % letters.length]];
       for (const [i, step] of this.demo.script.entries()) {
         if (token !== this.run) return;
@@ -78,12 +80,20 @@ export class DemoPlayer {
         if (step.scene) {
           this.nextId = this.nextId ?? makeIds(1);
           this.board.clearSelection();
-          grid = gridFromRows(step.scene.rows, this.nextId);
+          ({ grid, marks } = parseScene(step.scene.rows, this.nextId));
           refillAt = 0;
           ctx = { streak: 1, blast: step.scene.blast ?? 'plus', rainbowReward: !!step.scene.rainbowReward, nextId: this.nextId, refill: refillFrom(step.scene.refill ?? 'RBG') };
           path = [];
+          this.board.marks = marks;
           this.board.setGrid(grid);
           if (!(await this.#wait(step.wait ?? 900, token))) return;
+        }
+        if (step.surge) {
+          grid = surgeGrid(grid, marks);
+          marks = new Set();
+          this.board.marks = marks;
+          this.board.setGrid(grid, { spawn: false });
+          if (!(await this.#wait(1500, token))) return;
         }
         if (step.shuffleTo) {
           const fresh = gridFromRows(step.shuffleTo, makeIds(9000));
@@ -102,7 +112,7 @@ export class DemoPlayer {
           }
           if (!(await this.#wait(700, token))) return;
         }
-        if (step.wait && !step.scene && !step.drag && !step.release && !step.tick && !step.shuffleTo) {
+        if (step.wait && !step.scene && !step.drag && !step.release && !step.tick && !step.shuffleTo && !step.surge) {
           if (!(await this.#wait(step.wait, token))) return;
         }
         if (step.drag) {

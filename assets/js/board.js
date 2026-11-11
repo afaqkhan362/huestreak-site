@@ -1,7 +1,7 @@
 // The board you can see and play. Draws a grid from engine.js tiles, handles drag input, and animates clears, gravity and refills.
 // All colours come from CSS (theme variables); this file never touches a colour.
-import { canExtend, joinable, MIN_CHAIN } from './engine.js?v=69b98c11';
-import { tileArt } from './tile-art.js?v=69b98c11';
+import { canExtend, joinable, MIN_CHAIN } from './engine.js?v=a06e3597';
+import { tileArt } from './tile-art.js?v=a06e3597';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sleep = (ms) => new Promise((r) => setTimeout(r, reduceMotion() ? Math.min(ms, 30) : ms));
@@ -24,6 +24,7 @@ export class Board {
     this.path = [];
     this.selecting = false;
     this.busy = false;
+    this.marks = new Set();           // ids of tiles marked for the next surge (amber ring); set by the Surge demo
 
     el.classList.add('board');
     el.setAttribute('role', 'img');
@@ -105,6 +106,7 @@ export class Board {
     const keep = [...node.classList].filter((c) => c === 'tile' || c === 'tile--spawn' || c === 'is-selected' || c === 'is-clearing' || c === 'is-hint');
     node.className = keep.join(' ');
     node.classList.add(`tile--${tile.kind}`);
+    node.classList.toggle('is-marked', this.marks.has(tile.id));
     // a locked tile hides its colour, exactly like in the game: it is drawn as a cracked brick and carries no colour
     if (tile.color && tile.kind !== 'locked') node.dataset.c = tile.color; else delete node.dataset.c;
     const face = node.firstElementChild;

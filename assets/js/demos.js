@@ -1,12 +1,31 @@
 // The scripted gameplay demos on the Gameplay page. Plain data: what is on the board and what the "finger" does, with a caption per step.
 // The same script runs headlessly in tests (simulate), so an illegal path or a wrong claim fails the build instead of confusing a visitor.
 //
-// Tile tokens: R B G Y P = coloured tile, # brick, #1 cracked brick, xR locked red tile, b3R bomb (fuse 3) red, gR8 gold bomb (8 s) red, W rainbow.
-// Steps: { scene }  { wait }  { drag: [[row, col], ...], release? }  { release }  { tick: seconds }  { shuffleTo: rows }   each with a caption.
+// Tile tokens: R B G Y P = coloured tile, # brick, #1 cracked brick, b3R bomb (fuse 3) red, gR8 gold bomb (8 s) red, W rainbow.
+// A trailing * marks a tile for the next surge (amber ring), e.g. R*.
+// Steps: { scene }  { wait }  { drag: [[row, col], ...], release? }  { release }  { tick: seconds }  { shuffleTo: rows }  { surge: true }   each with a caption.
 
-import { gridFromRows, makeIds, applyChain, tickGold, canExtend, hasMove } from './engine.js?v=69b98c11';
+import { gridFromRows, makeIds, applyChain, tickGold, canExtend, hasMove, shuffleColors, mulberry32 } from './engine.js?v=a06e3597';
 
 const COLOR = { R: 1, B: 2, G: 3, Y: 4, P: 5 };
+
+/** Parses a scene, where a token ending in * is marked for the next surge. Returns the board and the ids of the marked tiles. */
+export function parseScene(rows, nextId) {
+  const tokens = rows.map((r) => r.split(' '));
+  const grid = gridFromRows(tokens.map((r) => r.map((t) => (t.endsWith('*') ? t.slice(0, -1) : t)).join(' ')), nextId);
+  const marks = new Set();
+  tokens.forEach((r, ri) => r.forEach((t, ci) => { if (t.endsWith('*')) marks.add(grid[ri][ci].id); }));
+  return { grid, marks };
+}
+
+/**
+ * The board clock hits zero: every marked tile still on the board turns into a brick (the ones you chained away were defended),
+ * then every plain tile's colour is reshuffled, so the board you planned for is gone. Same rule as the game's Surge.
+ */
+export function surgeGrid(grid, marks) {
+  const bricked = grid.map((row) => row.map((t) => (t && marks.has(t.id) ? { id: t.id, kind: 'brick', hp: 2 } : t)));
+  return shuffleColors(bricked, mulberry32(7));
+}
 
 export const DEMOS = {
   chain: {
@@ -32,14 +51,21 @@ export const DEMOS = {
       { release: true, caption: 'A Rainbow tile joins any colour' },
     ],
   },
-  bricks: {
-    label: 'Bricks and locks',
+  surge: {
+    label: 'Surge: beat the board clock',
     script: [
-      { scene: { rows: ['R R R B', 'G # G B', 'G R R xG', 'B R G G'], refill: 'R' }, caption: 'A brick can never be chained', wait: 1500 },
+      { scene: { rows: ['R* R R B', 'G B* G B', 'B G Y G'], refill: 'RBG' }, caption: 'Amber rings mark what the next surge will turn into bricks', wait: 1900 },
+      { drag: [[0, 0], [0, 1], [0, 2]], caption: 'Chain a marked tile to defend it', release: true },
+      { surge: true, caption: 'The clock hits zero: a surge!' },
+      { wait: 1900, caption: 'The tile you left alone is a brick, the colours are new' },
+    ],
+  },
+  bricks: {
+    label: 'Bricks',
+    script: [
+      { scene: { rows: ['R R R B', 'G # G B', 'G R R G', 'B R G G'], refill: 'R' }, caption: 'A brick can never be chained', wait: 1500 },
       { drag: [[0, 0], [0, 1], [0, 2]], caption: 'Clear right next to it: the brick cracks', release: true },
       { drag: [[0, 0], [0, 1], [0, 2]], caption: 'Clear next to it again: it breaks', release: true },
-      { scene: { rows: ['B B B G', 'G xR G R', 'R R R B'], refill: 'R' }, caption: 'A padlock only needs one clear', wait: 1300 },
-      { drag: [[0, 0], [0, 1], [0, 2]], caption: 'It opens and frees the tile inside', release: true },
     ],
   },
   hazard: {
@@ -70,17 +96,23 @@ export const DEMOS = {
 /** Runs a demo with the engine only. Returns one entry per step: the points scored, events and the final board. */
 export function simulate(demo) {
   const nextId = makeIds(1);
-  let grid = null, ctx = null, path = [], refillAt = 0;
+  let grid = null, ctx = null, path = [], refillAt = 0, marks = new Set();
   const log = [];
   const refillFrom = (letters) => () => COLOR[letters[refillAt++ % letters.length]];
 
   for (const [i, step] of demo.script.entries()) {
     const entry = { i, caption: step.caption, points: 0, exploded: 0, wiped: 0, freed: 0, broken: 0, cracked: 0, rainbow: false };
     if (step.scene) {
-      grid = gridFromRows(step.scene.rows, nextId);
+      ({ grid, marks } = parseScene(step.scene.rows, nextId));
       refillAt = 0;
       ctx = { streak: 1, blast: step.scene.blast ?? 'plus', rainbowReward: !!step.scene.rainbowReward, nextId, refill: refillFrom(step.scene.refill ?? 'RBG') };
       path = [];
+    }
+    if (step.surge) {
+      entry.bricked = grid.flat().filter((t) => t && marks.has(t.id)).length;
+      grid = surgeGrid(grid, marks);
+      marks = new Set();
+      if (!hasMove(grid)) throw new Error(`Step ${i}: the board after the surge has no chain`);
     }
     if (step.shuffleTo) {
       const fresh = gridFromRows(step.shuffleTo, nextId);
@@ -105,6 +137,7 @@ export function simulate(demo) {
       const out = applyChain(grid, path, ctx);
       if (!out) throw new Error(`Step ${i}: releasing ${path.length} tiles is not a legal chain (${step.caption})`);
       grid = out.next;
+      entry.defended = [...marks].filter((id) => !grid.flat().some((t) => t && t.id === id)).length;
       Object.assign(entry, {
         points: out.points, exploded: out.exploded.length, wiped: out.wiped.length, freed: out.freed.length,
         broken: out.broken.length, cracked: out.cracked.length, rainbow: !!out.rainbowEarned, length: out.length, bricked: out.bricked.length,

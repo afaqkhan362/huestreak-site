@@ -198,6 +198,8 @@ a:hover { text-decoration-thickness: 2.5px; }
 .tile.is-selected { z-index: 3; }
 /* the game outlines a selected tile with a white ring; it does not enlarge it */
 .tile.is-selected .tile__face { outline: 3px solid var(--glow); outline-offset: 0.5px; }
+.tile.is-marked .tile__face { outline: 3px solid #ffb02e; outline-offset: 1px; animation: mark 0.9s var(--ease) infinite alternate; }
+@keyframes mark { from { outline-color: #ffb02e; } to { outline-color: rgb(255 176 46 / 0.35); } }
 .tile.is-clearing .tile__face { transform: scale(0); opacity: 0; transition: transform 0.32s var(--ease), opacity 0.32s; }
 .tile.is-hint .tile__face { animation: hint 1.1s var(--ease) infinite; }
 @keyframes hint { 50% { transform: scale(1.1); box-shadow: 0 0 0 3px var(--glow); } }

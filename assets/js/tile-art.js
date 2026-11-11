@@ -18,21 +18,13 @@ const bombBody = (p) => `
   <path d="${BOMB.wick}" fill="none" stroke="${p.wick}" stroke-width="${BOMB.wickWidth}" stroke-linecap="round"/>
   <circle cx="${BOMB.spark.cx}" cy="${BOMB.spark.cy}" r="${BOMB.spark.r}" fill="${p.spark}"/>`;
 
-/** A brick wall: a whole brick (2 hits left) or a cracked one (1 hit left). A lock is a different drawing (padlock). */
+/** A brick wall: a solid brick (2 hits left) or a cracked one (1 hit left). There is no other kind of wall tile. */
 function brick(cracked) {
   const mortar = '#3a3d46', stone = cracked ? '#7d828d' : '#a3a9b6';
   const courses = [[12, [[10, 48], [52, 90]]], [40, [[10, 30], [34, 66], [70, 90]]], [68, [[10, 48], [52, 90]]]];
   return `<rect x="6" y="6" width="88" height="88" rx="10.8" fill="${mortar}"/>`
     + courses.flatMap(([y, bricks]) => bricks.map(([x0, x1]) => `<rect x="${x0}" y="${y}" width="${x1 - x0}" height="20" rx="3" fill="${stone}"/>`)).join('')
     + (cracked ? '<path d="M 34 10 L 46 40 L 56 54 L 62 90" fill="none" stroke="#14151a" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>' : '');
-}
-
-/** A lock: a tile hidden behind a padlock (one clear beside it frees the tile). Drawn differently from a brick on purpose. */
-function padlock() {
-  return '<rect x="6" y="6" width="88" height="88" rx="10.8" fill="#4a4f5c"/>'
-    + '<path d="M 40.4 46 L 40.4 36.5 A 9.6 9.6 0 0 1 59.6 36.5 L 59.6 46" fill="none" stroke="#d6d9e0" stroke-width="7" stroke-linecap="round"/>'
-    + '<rect x="32" y="46" width="36" height="28" rx="5" fill="#d6d9e0"/>'
-    + '<circle cx="50" cy="58.6" r="4" fill="#3a3d46"/><rect x="48.8" y="58.6" width="2.4" height="8.4" rx="1" fill="#3a3d46"/>';
 }
 
 /** The nine dots of a Rainbow tile: one in the middle, four at the corners, four in between. Corner dots follow the theme's tile colours. */
@@ -51,7 +43,7 @@ export function tileArt(tile) {
   const svg = (inner) => `<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">${inner}</svg>`;
   switch (tile.kind) {
     case 'brick': return svg(brick((tile.hp ?? 2) <= 1));
-    case 'locked': return svg(padlock());
+    case 'locked': return svg(brick(true));
     case 'rainbow': return svg(rainbow());
     case 'bomb': {
       const n = Math.max(0, tile.fuse);
