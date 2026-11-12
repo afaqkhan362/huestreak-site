@@ -1,7 +1,7 @@
 // The board you can see and play. Draws a grid from engine.js tiles, handles drag input, and animates clears, gravity and refills.
 // All colours come from CSS (theme variables); this file never touches a colour.
-import { canExtend, joinable, MIN_CHAIN } from './engine.js?v=a06e3597';
-import { tileArt } from './tile-art.js?v=a06e3597';
+import { canExtend, joinable, MIN_CHAIN } from './engine.js?v=68e5d285';
+import { tileArt } from './tile-art.js?v=68e5d285';
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sleep = (ms) => new Promise((r) => setTimeout(r, reduceMotion() ? Math.min(ms, 30) : ms));
@@ -24,7 +24,8 @@ export class Board {
     this.path = [];
     this.selecting = false;
     this.busy = false;
-    this.marks = new Set();           // ids of tiles marked for the next surge (amber ring); set by the Surge demo
+    this.marks = new Set();           // ids of tiles marked for the next surge (amber ring)
+    this.bombMarks = new Set();       // the marked tiles that will become a hazard bomb instead of a brick (red ring)
 
     el.classList.add('board');
     el.setAttribute('role', 'img');
@@ -107,6 +108,7 @@ export class Board {
     node.className = keep.join(' ');
     node.classList.add(`tile--${tile.kind}`);
     node.classList.toggle('is-marked', this.marks.has(tile.id));
+    node.classList.toggle('is-marked--bomb', this.marks.has(tile.id) && this.bombMarks.has(tile.id));
     // a locked tile hides its colour, exactly like in the game: it is drawn as a cracked brick and carries no colour
     if (tile.color && tile.kind !== 'locked') node.dataset.c = tile.color; else delete node.dataset.c;
     const face = node.firstElementChild;
@@ -125,6 +127,8 @@ export class Board {
     this.onSelect?.(this.path);
   }
   clearSelection() { this.select([]); }
+  /** Drops a drag in progress (the clock surged under the finger, or a pause card opened). */
+  cancelSelection() { this.selecting = false; this.clearSelection(); }
   #nodeAt(r, c) { const t = this.grid[r]?.[c]; return t ? this.nodes.get(t.id) : null; }
 
   hint(path) { this.clearHint(); for (const p of path) this.#nodeAt(p.r, p.c)?.classList.add('is-hint'); }

@@ -148,24 +148,7 @@ a:hover { text-decoration-thickness: 2.5px; }
 .facts li { display: flex; gap: var(--s-2); }
 .facts li::before { content: ""; width: 8px; height: 8px; border-radius: 3px; background: var(--accent); margin-top: 0.5em; flex: none; }
 
-/* ── Hero ───────────────────────────────────────────────────────────────── */
-.hero { padding-block: clamp(var(--s-6), 6vw, var(--s-8)) var(--s-7); }
-.hero__grid { display: grid; gap: var(--s-7); align-items: center; grid-template-columns: 1fr 1fr; }
-@media (max-width: 900px) { .hero__grid { grid-template-columns: 1fr; } }
-.hero h1 { font-size: clamp(2.5rem, 1.3rem + 4.4vw, 4.4rem); text-wrap: balance; }
-.hero h1 em { font-style: normal; color: var(--accent-text); }
-.hero .lead { margin-top: var(--s-4); }
-.hero__cta { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-6); }
-.hero__meta { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-5); }
-
 /* ── Tiles and the board ────────────────────────────────────────────────── */
-.board-card { padding: var(--s-4); display: grid; gap: var(--s-4); }
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-2); text-align: center; }
-.stat { padding: var(--s-2) var(--s-1); border-radius: var(--r-md); background: color-mix(in srgb, var(--bg) 55%, transparent); border: var(--bw) solid var(--border); }
-.stat__label { display: block; font-size: 0.66rem; font-weight: var(--fw-black); letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-faint); }
-.stat__value { display: block; font-size: 1.5rem; font-weight: var(--fw-black); line-height: 1.2; font-variant-numeric: tabular-nums; }
-.stat__value[data-hot="true"] { color: var(--combo); }
-
 .board {
   --rows: 8; --cols: 8; --gap: 6px; --tile-r: 12px;
   position: relative; width: 100%; max-width: 560px; margin-inline: auto;
@@ -198,8 +181,11 @@ a:hover { text-decoration-thickness: 2.5px; }
 .tile.is-selected { z-index: 3; }
 /* the game outlines a selected tile with a white ring; it does not enlarge it */
 .tile.is-selected .tile__face { outline: 3px solid var(--glow); outline-offset: 0.5px; }
-.tile.is-marked .tile__face { outline: 3px solid #ffb02e; outline-offset: 1px; animation: mark 0.9s var(--ease) infinite alternate; }
-@keyframes mark { from { outline-color: #ffb02e; } to { outline-color: rgb(255 176 46 / 0.35); } }
+.tile.is-marked { --mark: var(--signal-amber); }
+.tile.is-marked--bomb { --mark: var(--signal-red); }      /* this mark becomes a hazard bomb, not a brick */
+.tile.is-marked .tile__face { outline: 3px solid var(--mark); outline-offset: 1px; animation: mark 0.9s var(--ease) infinite alternate; }
+.board[data-urgent="true"] .tile.is-marked .tile__face { animation-duration: 0.32s; }   /* the surge is seconds away */
+@keyframes mark { from { outline-color: var(--mark); } to { outline-color: color-mix(in srgb, var(--mark) 35%, transparent); } }
 .tile.is-clearing .tile__face { transform: scale(0); opacity: 0; transition: transform 0.32s var(--ease), opacity 0.32s; }
 .tile.is-hint .tile__face { animation: hint 1.1s var(--ease) infinite; }
 @keyframes hint { 50% { transform: scale(1.1); box-shadow: 0 0 0 3px var(--glow); } }
@@ -241,6 +227,78 @@ a:hover { text-decoration-thickness: 2.5px; }
   background: var(--accent); color: var(--on-accent); border: 2px solid var(--surface); font-size: 0.75rem; font-weight: var(--fw-black);
 }
 .hint-text { color: var(--text-muted); font-size: var(--fs-sm); margin: 0; }
+
+/* ── The game screen (home page): laid out like the phone's game screen, a slim bar, the score, the surge clock, then the board ─────── */
+.play { display: grid; justify-items: center; padding: var(--s-4) var(--gutter) var(--s-6); }
+.game {
+  /* the board takes the height that is left under the header and the HUD, so the whole game fits one screen */
+  --board-w: clamp(240px, min(calc(100svh - var(--header-h) - 410px), calc(100vw - 2 * var(--gutter) - 32px)), 480px);
+  position: relative; width: calc(var(--board-w) + 32px); max-width: 100%;
+}
+.game .board { width: var(--board-w); max-width: none; }
+.game__top { display: flex; align-items: center; justify-content: space-between; padding-inline: 16px; }
+.game__title { margin: 0; font-size: 0.875rem; font-weight: var(--fw-black); letter-spacing: 0.14em; color: var(--text); text-transform: uppercase; }
+.round {
+  width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; padding: 0;
+  color: var(--text); background: var(--surface); border: var(--bw) solid color-mix(in srgb, var(--text) 24%, transparent);
+  transition: background var(--dur-1), transform var(--dur-1) var(--ease);
+}
+.round:hover { background: color-mix(in srgb, var(--text) 10%, var(--surface)); }
+.round:active { transform: scale(0.94); }
+.round svg { width: 18px; height: 18px; }
+.game__stats { display: flex; justify-content: space-between; align-items: flex-end; padding: 10px 20px 8px; }
+.game__stats > div { display: grid; }
+.game__stats > div:last-child { text-align: right; }
+.lbl { font-size: 0.625rem; font-weight: var(--fw-black); letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-faint); }
+.val { font-size: 1.75rem; font-weight: var(--fw-black); line-height: 1.15; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.surge { padding-inline: 24px; display: grid; gap: 6px; margin-bottom: 2px; }
+.surge__row { display: flex; justify-content: space-between; align-items: baseline; }
+.surge__label { font-size: 0.6875rem; font-weight: var(--fw-black); letter-spacing: 0.2em; color: var(--text-faint); }
+.surge__secs { font-size: 1.125rem; font-weight: var(--fw-black); font-variant-numeric: tabular-nums; }
+.surge[data-level="urgent"] .surge__label, .surge[data-level="urgent"] .surge__secs { color: var(--signal-red); }
+.surge__track { height: 6px; border-radius: 3px; overflow: hidden; background: color-mix(in srgb, var(--text) 14%, transparent); }
+.surge__fill { height: 100%; width: 100%; border-radius: 3px; background: var(--signal-blue); transition: width 0.9s linear, background-color 0.9s linear; }
+.surge[data-level="warn"] .surge__fill { background: var(--signal-amber); }
+.surge[data-level="urgent"] .surge__fill { background: var(--signal-red); }
+.streak-row { height: 30px; display: grid; place-items: center; }
+.streak-badge {
+  font-size: 0.75rem; font-weight: var(--fw-black); letter-spacing: 0.04em; padding: 5px 14px; border-radius: var(--r-pill);
+  color: var(--accent-text); background: color-mix(in srgb, var(--accent) 16%, transparent); border: var(--bw) solid color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.streak-badge[data-max="true"] { color: var(--signal-red); background: color-mix(in srgb, var(--signal-red) 16%, transparent); border-color: color-mix(in srgb, var(--signal-red) 50%, transparent); }
+.streak-badge[hidden] { display: none; }
+.feedback { height: 26px; display: grid; place-items: center; font-size: 0.875rem; font-weight: var(--fw-bold); letter-spacing: 0.03em; color: var(--text-muted); }
+.game .board-wrap { margin-top: 2px; }
+.game__banner {
+  position: absolute; z-index: 9; left: 8%; right: 8%; top: 14%; display: grid; gap: 2px; justify-items: center; text-align: center; padding: 12px 16px;
+  border-radius: var(--r-md); background: var(--surface); border: 2px solid var(--signal-amber); box-shadow: var(--shadow-2); animation: end-in 140ms var(--ease);
+}
+.game__banner[hidden] { display: none; }
+.game__banner b { font-size: 1.25rem; font-weight: var(--fw-black); letter-spacing: 0.18em; color: var(--signal-amber); }
+.game__banner span { font-size: 0.8125rem; font-weight: var(--fw-bold); }
+.game__foot { display: grid; margin-top: 12px; min-height: 92px; align-items: start; }
+.game__foot > * { grid-area: 1 / 1; }
+.game__tip {
+  display: grid; gap: 2px; align-content: center; padding: 10px 14px; margin-inline: 16px; min-height: 64px;
+  border-radius: 14px; background: var(--surface); border: var(--bw) solid var(--accent); animation: end-in 220ms var(--ease);
+}
+.game__tip[hidden] { display: none; }
+.game__tip b { font-size: 0.8125rem; font-weight: var(--fw-black); letter-spacing: 0.03em; color: var(--accent-text); }
+.game__tip span { font-size: 0.8125rem; font-weight: var(--fw-semibold); }
+.game__note { margin: 0; padding: 0.5rem 1rem 0; text-align: center; color: var(--text-faint); font-size: var(--fs-sm); }
+.game__tip:not([hidden]) ~ .game__note { visibility: hidden; }
+.board__end .label { font-size: 0.6875rem; font-weight: var(--fw-black); letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-faint); }
+.board__end .score + .label { margin-top: calc(var(--s-1) * -1); }
+.board__end .actions--col { flex-direction: column; align-items: stretch; width: min(100%, 15rem); }
+.board__end .btn { min-height: 46px; }
+.board__end .btn--sm { min-height: 36px; padding: 0.35rem 0.8rem; font-size: var(--fs-sm); }
+.board__end .stores { display: flex; gap: var(--s-2); justify-content: center; }
+.board__end .soon { font-size: var(--fs-xs); color: var(--text-faint); text-align: center; }
+.game .board__end { overflow-y: auto; gap: var(--s-2); padding: var(--s-4); }   /* never taller than the board: it scrolls instead of spilling out */
+.game .board__end .score { font-size: 2.2rem; }
+.game .board-wrap { container-type: inline-size; }
+@container (max-width: 340px) { .game .board__end p { display: none; } }
+@media (max-width: 380px) { .val { font-size: 1.5rem; } }
 
 /* Scripted demos */
 .demo { display: grid; gap: var(--s-3); align-content: start; }

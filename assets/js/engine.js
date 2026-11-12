@@ -256,3 +256,53 @@ export function shuffleColors(grid, rng) {
   }
   return grid;
 }
+
+// ── Surge (the website's playable demo of the game's main mode) ──────────────
+// The same idea as the game: a clock counts down, the board marks some tiles, and when the clock hits zero every marked tile that is
+// still there becomes a brick (or, on some surges, a hazard bomb) and all the colours are reshuffled. The numbers are the demo's own.
+const isPlain = (t) => !!t && t.kind === 'plain';
+
+/** `n` distinct plain tiles, picked with the caller's random stream (Fisher-Yates over the candidates). */
+export function pickPlain(grid, n, rng) {
+  const pool = grid.flat().filter(isPlain);
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  return pool.slice(0, n);
+}
+
+/** The starting board of a run: a few bricks, a Rainbow tile and a gold bomb already in place. Returns a new grid. */
+export function preloadBoard(grid, rng, { bricks = 3, rainbows = 1, golds = 1, goldSeconds = 14 } = {}) {
+  const g = clone(grid);
+  const swap = (tile, next) => { const [r, c] = locate(g, tile.id); g[r][c] = { id: tile.id, ...next }; };
+  const tiles = pickPlain(g, bricks + rainbows + golds, rng);
+  tiles.slice(0, bricks).forEach((t) => swap(t, { kind: 'brick', hp: 2 }));
+  tiles.slice(bricks, bricks + rainbows).forEach((t) => swap(t, { kind: 'rainbow' }));
+  tiles.slice(bricks + rainbows).forEach((t) => swap(t, { kind: 'gold', color: t.color, timer: goldSeconds, timerMax: goldSeconds }));
+  return g;
+}
+function locate(grid, id) {
+  for (let r = 0; r < grid.length; r++) for (let c = 0; c < grid[r].length; c++) if (grid[r][c]?.id === id) return [r, c];
+  throw new Error(`No tile ${id}`);
+}
+
+/** What the next surge will attack: `marks` become bricks, and `bombs` (a subset) become hazard bombs instead. Both are sets of tile ids. */
+export function chooseMarks(grid, count, rng, withBomb = false) {
+  const picked = pickPlain(grid, count, rng).map((t) => t.id);
+  return { marks: new Set(picked), bombs: new Set(withBomb ? picked.slice(0, 1) : []) };
+}
+
+/**
+ * The clock hits zero. Every marked tile still on the board becomes a brick (a hazard bomb if it was a bomb mark), then the colours are
+ * reshuffled. `stuck` is true when no chain is left afterwards, which ends the run, as in the game.
+ */
+export function applySurge(grid, marks, bombs, rng, { fuse = 3 } = {}) {
+  let bricked = 0, bombed = 0;
+  const hit = grid.map((row) => row.map((t) => {
+    if (!isPlain(t) || !marks.has(t.id)) return t;
+    if (bombs.has(t.id)) { bombed++; return { id: t.id, kind: 'bomb', color: t.color, fuse }; }
+    bricked++;
+    return { id: t.id, kind: 'brick', hp: 2 };
+  }));
+  let next = shuffleColors(hit, rng);
+  for (let i = 0; i < 10 && !hasMove(next); i++) next = shuffleColors(hit, rng);
+  return { grid: next, bricked, bombed, stuck: !hasMove(next) };
+}

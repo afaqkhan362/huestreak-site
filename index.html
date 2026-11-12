@@ -4,21 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Huestreak · Chain Color Puzzle</title>
-<meta name="description" content="Huestreak is a fast, hard chain color puzzle for iPhone, iPad and Android. Drag across matching tiles, build a streak and clear the board. Coming soon.">
+<meta name="description" content="Play a Huestreak demo right here: drag across matching tiles, beat the surge clock and build a streak. The full game is coming soon to iPhone, iPad and Android.">
 <link rel="canonical" href="https://huestreak.com/">
 <meta name="theme-color" content="#0b0b18">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Huestreak">
 <meta property="og:title" content="Huestreak · Chain Color Puzzle">
-<meta property="og:description" content="Huestreak is a fast, hard chain color puzzle for iPhone, iPad and Android. Drag across matching tiles, build a streak and clear the board. Coming soon.">
+<meta property="og:description" content="Play a Huestreak demo right here: drag across matching tiles, beat the surge clock and build a streak. The full game is coming soon to iPhone, iPad and Android.">
 <meta property="og:url" content="https://huestreak.com/">
 <meta property="og:image" content="https://huestreak.com/assets/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/tokens.css?v=a06e3597">
-<link rel="stylesheet" href="assets/css/themes.css?v=a06e3597">
-<link rel="stylesheet" href="assets/css/site.css?v=a06e3597">
+<link rel="stylesheet" href="assets/css/tokens.css?v=68e5d285">
+<link rel="stylesheet" href="assets/css/themes.css?v=68e5d285">
+<link rel="stylesheet" href="assets/css/site.css?v=68e5d285">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -29,6 +29,7 @@
       Huestreak
     </a>
     <nav class="nav" id="nav" aria-label="Main">
+      <a href="index.html" aria-current="page">Play</a>
       <a href="gameplay.html">Gameplay</a>
       <a href="support.html">Support</a>
     </nav>
@@ -39,139 +40,40 @@
 </header>
 
 <main id="main">
-<section class="hero">
-  <div class="container hero__grid">
-    <div>
-      <span class="eyebrow">Chain Color Puzzle</span>
-      <h1>Chain the hues.<br><em>Keep the streak.</em></h1>
-      <p class="lead">A fast, hard puzzle for phones and tablets. Drag across tiles of one colour, clear the board, and chase a streak before the board fights back.</p>
-      <div class="hero__cta">
-        <a class="btn" href="gameplay.html">See how it plays</a>
-        <a class="btn btn--ghost" href="#play">Try it now</a>
-      </div>
-      <div class="hero__meta">
-        <span class="chip">iPhone, iPad and Android</span>
-        <span class="chip">Coming soon</span>
-      </div>
+<section class="play" aria-label="Huestreak, playable demo">
+  <div class="game" id="game">
+    <div class="game__top">
+      <button class="round" id="btn-pause" type="button" aria-label="Pause">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg>
+      </button>
+      <h1 class="game__title">Surge · Easy</h1>
+      <button class="round" id="btn-restart" type="button" aria-label="Restart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></svg>
+      </button>
     </div>
 
-    <div class="card board-card" id="play">
-      <div class="stats" aria-live="off">
-        <div class="stat"><span class="stat__label">Score</span><span class="stat__value" id="stat-score">0</span></div>
-        <div class="stat"><span class="stat__label">Streak</span><span class="stat__value" id="stat-streak" data-hot="false">×1</span></div>
-        <div class="stat"><span class="stat__label">Moves left</span><span class="stat__value" id="stat-moves">5</span></div>
-      </div>
-      <div class="board-wrap">
-        <div class="board" id="hero-board"></div>
-        <div class="board__end" id="board-end" role="dialog" aria-labelledby="end-title" hidden></div>
-      </div>
-      <p class="hint-text" id="hint-text" role="status">Drag across touching tiles of one colour. Three or more clear.</p>
+    <div class="game__stats">
+      <div><span class="lbl">Best</span><span class="val" id="stat-best">0</span></div>
+      <div><span class="lbl">Score</span><span class="val" id="stat-score">0</span></div>
     </div>
-  </div>
-</section>
 
-<section class="section" aria-labelledby="how">
-  <div class="container">
-    <div class="section__head">
-      <span class="eyebrow">How it plays</span>
-      <h2 id="how">Easy to start. Hard to put down.</h2>
-      <p>One gesture does everything. The depth is in what you chain, and how fast you chain the next one.</p>
+    <div class="surge" id="surge" role="timer" data-level="ok">
+      <div class="surge__row"><span class="surge__label" id="surge-label">NEXT SURGE</span><span class="surge__secs" id="surge-secs">20s</span></div>
+      <div class="surge__track"><div class="surge__fill" id="surge-fill"></div></div>
     </div>
-    <div class="grid">
-      <article class="card">
-        <div class="icon-tile" aria-hidden="true"><span class="chain-art"><i></i><i></i><i></i></span></div>
-        <h3>Drag to chain</h3>
-        <p class="muted">Press a tile and drag across touching tiles of the same colour. Chain 3 or more, then lift your finger to clear them. Wrong turn? Drag back to undo a step.</p>
-      </article>
-      <article class="card">
-        <div class="icon-tile"><svg class="icon icon--lg" aria-hidden="true"><use href="assets/icons/sprite.svg#i-combo"></use></svg></div>
-        <h3>Build a streak</h3>
-        <p class="muted">Longer chains are worth more for every tile. Start the next chain inside the streak window and your multiplier keeps climbing.</p>
-      </article>
-      <article class="card">
-        <div class="icon-tile"><svg class="icon icon--lg" aria-hidden="true"><use href="assets/icons/sprite.svg#i-locked"></use></svg></div>
-        <h3>Survive the board</h3>
-        <p class="muted">Bricks wall off tiles until you break them. Hazard bombs turn their neighbours to bricks. Gold bombs clear a whole colour, if you are quick. Nothing is luck: the board always warns you first.</p>
-      </article>
-    </div>
-    <p style="margin-top: var(--s-5)"><a href="gameplay.html">Watch every mechanic in action →</a></p>
-  </div>
-</section>
 
-<section class="section" aria-labelledby="modes">
-  <div class="container">
-    <div class="section__head">
-      <span class="eyebrow">Modes</span>
-      <h2 id="modes">Three ways to play</h2>
-    </div>
-    <div class="grid">
-      <article class="card">
-        <div class="icon-tile"><svg class="icon icon--lg" aria-hidden="true"><use href="assets/icons/sprite.svg#i-surge"></use></svg></div>
-        <h3>Surge</h3>
-        <p class="muted">Beat the board clock. Each surge reshuffles every colour, and tiles marked in amber turn to bricks unless you chain them first.</p>
-      </article>
-      <article class="card">
-        <div class="icon-tile"><svg class="icon icon--lg" aria-hidden="true"><use href="assets/icons/sprite.svg#i-blitz"></use></svg></div>
-        <h3>Blitz</h3>
-        <p class="muted">A 60 second sprint: every chain you clear adds seconds back.</p>
-      </article>
-      <article class="card">
-        <div class="icon-tile"><svg class="icon icon--lg" aria-hidden="true"><use href="assets/icons/sprite.svg#i-daily"></use></svg></div>
-        <h3>Daily</h3>
-        <p class="muted">Everyone gets the same board, with the same hazards landing on the same moves. You get one attempt a day, and the whole world is on the same leaderboard.</p>
-      </article>
-    </div>
-  </div>
-</section>
+    <div class="streak-row"><span class="streak-badge" id="streak" hidden></span></div>
+    <div class="feedback" id="feedback" role="status"></div>
 
-<section class="section" aria-labelledby="levels">
-  <div class="container">
-    <div class="section__head">
-      <span class="eyebrow">Levels</span>
-      <h2 id="levels">Pick how hard it fights back</h2>
-      <p>Surge has two levels, so it is always clear what you are choosing.</p>
+    <div class="board-wrap">
+      <div class="board" id="game-board"></div>
+      <div class="game__banner" id="banner" role="status" hidden><b></b><span></span></div>
+      <div class="board__end" id="board-end" role="dialog" aria-modal="false" hidden></div>
     </div>
-    <div class="grid grid--2">
-      <article class="card">
-        <h3>Easy</h3>
-        <p class="muted">A roomy clock and gentle surges. A good place to learn the marks.</p>
-      </article>
-      <article class="card">
-        <h3>Hard</h3>
-        <p class="muted">A short clock, more bricks, and hazard bombs among the marks.</p>
-      </article>
-    </div>
-  </div>
-</section>
 
-<section class="section" aria-labelledby="fair">
-  <div class="container">
-    <div class="grid grid--2">
-      <article class="card">
-        <div class="icon-tile"><svg class="icon icon--lg" aria-hidden="true"><use href="assets/icons/sprite.svg#i-leaderboard"></use></svg></div>
-        <h3>Leaderboards you can trust</h3>
-        <p class="muted" id="fair">Every ranked game is issued by our server and replayed on our server before the score counts. Edited scores and impossible moves are thrown out, so a rank means something.</p>
-      </article>
-      <article class="card">
-        <div class="icon-tile"><svg class="icon icon--lg" aria-hidden="true"><use href="assets/icons/sprite.svg#i-new-best"></use></svg></div>
-        <h3>A world to climb</h3>
-        <p class="muted">Global boards for Surge, Blitz and the Daily, plus a board for each level: the same board for everyone, reset at midnight UTC. No account needed to start playing.</p>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section class="section section--tight" id="download" aria-labelledby="dl-title">
-  <div class="container">
-    <div class="card" style="text-align:center; padding: var(--s-7) var(--s-5);">
-      <span class="eyebrow">Download</span>
-      <h2 id="dl-title" style="font-size: var(--fs-2xl);">Play the full game</h2>
-      <p class="muted" style="max-width: 36rem; margin: var(--s-4) auto var(--s-5);">Surge, Blitz, a new Daily board every day, bombs and bricks that fight back, and global leaderboards. Huestreak is coming soon to iPhone, iPad and Android.</p>
-      <div class="store-row">
-        <span class="btn btn--ghost" aria-disabled="true">App Store · coming soon</span>
-        <span class="btn btn--ghost" aria-disabled="true">Google Play · coming soon</span>
-      </div>
-      <p class="muted" style="margin: var(--s-5) 0 0; font-size: var(--fs-sm);">Questions? <a href="support.html">Contact support</a>.</p>
+    <div class="game__foot">
+      <div class="game__tip" id="tip" role="status" hidden><b></b><span></span></div>
+      <p class="game__note">A demo of the mobile game. Coming soon to iPhone, iPad and Android.</p>
     </div>
   </div>
 </section>
@@ -209,8 +111,8 @@
   </div>
 </footer>
 
-<script type="module" src="assets/js/site.js?v=a06e3597"></script>
-<script type="module" src="assets/js/home.js?v=a06e3597"></script>
-<script type="module" src="assets/js/page.js?v=a06e3597"></script>
+<script type="module" src="assets/js/site.js?v=68e5d285"></script>
+<script type="module" src="assets/js/home.js?v=68e5d285"></script>
+<script type="module" src="assets/js/page.js?v=68e5d285"></script>
 </body>
 </html>

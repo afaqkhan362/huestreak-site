@@ -67,6 +67,11 @@
   --brick-base: #6b6f7a;
   --rainbow-base: #1a1a2e;
 
+  /* The game's signal colours (same in every theme): the amber mark, the red warning, the calm blue of a full surge clock */
+  --signal-amber: #ffb02e;
+  --signal-red: #ff6b6b;
+  --signal-blue: #5aa9ff;
+
   /* Motion */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --dur-1: 120ms;
