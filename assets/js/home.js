@@ -1,11 +1,13 @@
-// The home page IS the game: a short, playable run of Surge laid out like the phone's game screen. The clock counts down, tiles are marked,
-// and at zero the marked tiles turn to bricks (or a hazard bomb) and every colour is reshuffled. After a few surges the run ends with an
-// invitation to download. The numbers here are the demo's own, not the game's tuning.
-import { Board } from './board.js?v=68e5d285';
+// The home page IS the game: a short, playable run laid out like the phone's game screen, in two modes.
+//   Surge  a board clock counts down, tiles are marked, and at zero the marked tiles turn to bricks (or a hazard bomb) and every colour is
+//          reshuffled. After a few surges the run ends.
+//   Blitz  a 60 second sprint that starts on your first chain; every chain adds a little time; a board with no chain left reshuffles itself.
+// Either run ends with an invitation to download. The numbers here are the demo's own, not the game's tuning.
+import { Board } from './board.js?v=10a8b43f';
 import {
-  randomGrid, makeIds, mulberry32, applyChain, hasMove, findHint, streakMultiplier, STREAK_WINDOW_MS, COLORS,
+  randomGrid, makeIds, mulberry32, applyChain, hasMove, shuffleColors, findHint, streakMultiplier, STREAK_WINDOW_MS, COLORS,
   preloadBoard, chooseMarks, applySurge, tickGold, chainColor,
-} from './engine.js?v=68e5d285';
+} from './engine.js?v=10a8b43f';
 
 const $ = (sel) => document.querySelector(sel);
 const host = $('#game-board');
@@ -19,7 +21,10 @@ const DEMO = {
   bombEvery: 2,            // every this-many surges one mark is a hazard bomb
   goldSeconds: 16,
   defendBonus: 5,          // points for chaining a marked tile before the surge
+  blitzSeconds: 60,
+  blitzBonus: (n) => (n >= 6 ? 3 : n >= 4 ? 2 : 1),   // seconds a chain of n tiles adds back in Blitz
 };
+const TITLES = { surge: 'Surge · Easy', blitz: 'Blitz' };
 const TIPS = [   // shown once, the first time that tile is on the board (the same words as the game's tips)
   { id: 'locked', title: 'Cracked brick', body: 'One more clear right next to it breaks it.', present: (g) => g.some((t) => t.kind === 'brick' && t.hp <= 1) },
   { id: 'stone', title: 'Brick', body: "Can't be chained. Clear next to it twice: it cracks, then it breaks.", present: (g) => g.some((t) => t.kind === 'brick' && t.hp > 1) },
@@ -30,12 +35,16 @@ const interval = (count) => Math.max(DEMO.minSeconds, DEMO.firstSeconds - DEMO.s
 
 if (host) {
   const els = {
-    best: $('#stat-best'), score: $('#stat-score'), surge: $('#surge'), label: $('#surge-label'), secs: $('#surge-secs'), fill: $('#surge-fill'),
+    game: $('#game'), lblLeft: $('#lbl-left'), left: $('#stat-left'), lblRight: $('#lbl-right'), right: $('#stat-right'), title: $('.game__title'),
+    blitz: $('#blitz'), blitzFill: $('#blitz-fill'), tabs: [...document.querySelectorAll('.modes__btn')],
+    surge: $('#surge'), label: $('#surge-label'), secs: $('#surge-secs'), fill: $('#surge-fill'),
     streak: $('#streak'), feedback: $('#feedback'), banner: $('#banner'), tip: $('#tip'), end: $('#board-end'),
     pause: $('#btn-pause'), restart: $('#btn-restart'),
   };
   let st = null;                       // the run in progress
-  let best = 0;                        // best of this visit only: the site stores nothing in the browser
+  const best = { surge: 0, blitz: 0 }; // best of this visit only: the site stores nothing in the browser
+  let mode = 'surge';
+  let pendingMode = null;              // the mode a "switch?" card is asking about
   let idleTimer, bannerTimer, tipTimer, feedbackTimer;
   let surgeTotal = interval(0);
 
@@ -52,24 +61,32 @@ if (host) {
     const rng = mulberry32((Date.now() ^ (Math.random() * 1e9)) >>> 0);
     const nextId = makeIds(1);
     let grid = randomGrid(8, 8, rng, nextId, COLORS);
-    grid = preloadBoard(grid, rng, { bricks: 3, rainbows: 1, golds: 1, goldSeconds: DEMO.goldSeconds });
-    const next = chooseMarks(grid, DEMO.marksBase, rng, false);
+    let surge = null;
+    if (mode === 'surge') {      // Blitz is a pure sprint: no bricks, no bombs, no marks
+      grid = preloadBoard(grid, rng, { bricks: 3, rainbows: 1, golds: 1, goldSeconds: DEMO.goldSeconds });
+      const next = chooseMarks(grid, DEMO.marksBase, rng, false);
+      surge = { left: interval(0), count: 0, warned: next.marks, bombs: next.bombs };
+    }
     st = {
       rng, nextId, grid, score: 0, moves: 0, streak: 0, windowEnd: 0, status: 'playing', celebrated: false,
-      surge: { left: interval(0), count: 0, warned: next.marks, bombs: next.bombs },
+      surge, time: DEMO.blitzSeconds,
       goldDebt: 0, surgeDue: false, pausedAt: 0, seenTips: new Set(), shownTip: false,
     };
     surgeTotal = interval(0);
+    pendingMode = null;
+    els.game.dataset.mode = mode;
+    els.title.textContent = TITLES[mode];
+    els.tabs.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
     board.untoast();
     board.cancelSelection();
-    board.marks = st.surge.warned;
-    board.bombMarks = st.surge.bombs;
+    board.marks = surge ? surge.warned : new Set();
+    board.bombMarks = surge ? surge.bombs : new Set();
     board.el.dataset.urgent = 'false';
     board.setGrid(st.grid);
     hideOverlay(); hideBanner(); hideTip();
-    els.fill.style.transition = 'none'; els.fill.style.width = '100%'; void els.fill.offsetWidth; els.fill.style.transition = '';
+    for (const f of [els.fill, els.blitzFill]) { f.style.transition = 'none'; f.style.width = '100%'; void f.offsetWidth; f.style.transition = ''; }
     paint();
-    paintSurge();
+    paintClock();
     showFeedback('');
     checkTips();
     armIdle();
@@ -79,8 +96,15 @@ if (host) {
   function liveStreak() { return st && Date.now() <= st.windowEnd ? st.streak : 0; }
 
   function paint() {
-    els.best.textContent = Math.max(best, st.score).toLocaleString();
-    els.score.textContent = st.score.toLocaleString();
+    if (mode === 'blitz') {      // like the phone: score on the left, time on the right
+      els.lblLeft.textContent = 'Score'; els.left.textContent = st.score.toLocaleString();
+      els.lblRight.textContent = 'Time'; els.right.textContent = clockText(st.time);
+      els.right.dataset.hot = String(st.time <= 10 && st.status !== 'over');
+    } else {
+      els.lblLeft.textContent = 'Best'; els.left.textContent = Math.max(best.surge, st.score).toLocaleString();
+      els.lblRight.textContent = 'Score'; els.right.textContent = st.score.toLocaleString();
+      els.right.dataset.hot = 'false';
+    }
     const n = liveStreak();
     if (n >= 2) {
       const mult = streakMultiplier(n);
@@ -89,6 +113,18 @@ if (host) {
       els.streak.dataset.max = String(max);
       els.streak.textContent = `×${Number(mult.toFixed(1))}${max ? ' MAX STREAK' : ' STREAK'}`;
     } else els.streak.hidden = true;
+  }
+
+  const clockText = (t) => `${Math.floor(t / 60)}:${String(Math.max(0, t) % 60).padStart(2, '0')}`;
+
+  function paintClock() { if (mode === 'blitz') paintBlitz(); else paintSurge(); }
+
+  function paintBlitz() {
+    const frac = Math.max(0, st.time) / DEMO.blitzSeconds;
+    els.blitzFill.style.width = `${frac * 100}%`;
+    els.blitz.dataset.level = frac <= 0.17 ? 'urgent' : frac <= 0.5 ? 'warn' : 'ok';
+    els.right.textContent = clockText(st.time);
+    els.right.dataset.hot = String(st.time <= 10 && st.status !== 'over');
   }
 
   function paintSurge() {
@@ -167,7 +203,14 @@ if (host) {
     board.cancelSelection();
     board.clearHint();
     showFeedback('');
-    if (kind === 'restart') {
+    renderPause(kind);
+  }
+
+  function renderPause(kind) {
+    if (kind === 'switch') {
+      showOverlay(`<h3 id="end-title">Switch to ${pendingMode === 'blitz' ? 'Blitz' : 'Surge'}?</h3><p>Your current run will be lost.</p>
+        <div class="actions actions--col"><button class="btn" type="button" data-act="resume">Keep playing</button><button class="btn btn--ghost" type="button" data-act="switch">Switch</button></div>`, '[data-act="resume"]');
+    } else if (kind === 'restart') {
       showOverlay(`<h3 id="end-title">Restart?</h3><p>Your current run will be lost.</p>
         <div class="actions actions--col"><button class="btn" type="button" data-act="resume">Keep playing</button><button class="btn btn--ghost" type="button" data-act="restart">Restart</button></div>`, '[data-act="resume"]');
     } else {
@@ -176,8 +219,17 @@ if (host) {
     }
   }
 
+  function setMode(next) {
+    if (!st || next === mode) return;
+    pendingMode = next;
+    if (st.status === 'over' || st.moves === 0) { mode = next; newRun(); return; }
+    if (st.status === 'playing') pause('switch');
+    else renderPause('switch');       // a pause card is already open: ask on it
+  }
+
   function resume() {
     if (!st || st.status !== 'paused') return;
+    pendingMode = null;
     if (st.windowEnd > st.pausedAt) st.windowEnd += Date.now() - st.pausedAt;   // pausing must not use up the streak window
     st.status = 'playing';
     hideOverlay();
@@ -194,15 +246,18 @@ if (host) {
     st.status = 'over';
     clearTimeout(idleTimer);
     board.cancelSelection();
-    best = Math.max(best, st.score);
+    best[mode] = Math.max(best[mode], st.score);
     paint();
-    paintSurge();
+    paintClock();
     const score = st.score.toLocaleString();
+    const taste = mode === 'blitz'
+      ? 'That is a taste of Blitz. The full game adds Surge, a new Daily board every day and global leaderboards.'
+      : 'That is a taste of Surge. The full game adds Blitz, a new Daily board every day and global leaderboards.';
     setTimeout(() => {
       if (!st || st.status !== 'over') return;
       hideBanner(); hideTip();
       showOverlay(`<span class="label">${reason}</span><span class="score" id="end-title">${score}</span>
-        <p>That is a taste of Surge. The full game adds Blitz, a new Daily board every day and global leaderboards.</p>
+        <p>${taste}</p>
         <div class="actions actions--col">
           <button class="btn" type="button" data-act="restart">Play again</button>
           <div class="stores"><span class="btn btn--ghost btn--sm" aria-disabled="true">App Store</span><span class="btn btn--ghost btn--sm" aria-disabled="true">Google Play</span></div>
@@ -215,15 +270,24 @@ if (host) {
     const act = e.target.closest('[data-act]')?.dataset.act;
     if (act === 'resume') resume();
     else if (act === 'restart') newRun();
+    else if (act === 'switch' && pendingMode) { mode = pendingMode; newRun(); }
   });
   els.pause.addEventListener('click', () => (st.status === 'paused' ? resume() : pause('pause')));
   els.restart.addEventListener('click', askRestart);
+  els.tabs.forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
   document.addEventListener('visibilitychange', () => { if (document.hidden) pause('pause'); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && st?.status === 'paused') resume(); });
 
   // ── The board clock ──────────────────────────────────────────────────────
   function tick() {
     if (!st || st.status !== 'playing') return;
+    if (mode === 'blitz') {      // the sprint's clock starts with the first chain, as in the game
+      if (st.moves === 0) return;
+      st.time -= 1;
+      paintBlitz();
+      if (st.time <= 0) endRun("Time's up");
+      return;
+    }
     if (board.busy) st.goldDebt += 1; else applyGold(1);
     if (st.surge.left <= 1) {
       if (board.busy) { st.surgeDue = true; return; }
@@ -279,17 +343,19 @@ if (host) {
     if (!out) { board.clearSelection(); armIdle(); return; }
 
     const gone = new Set([...out.cleared, ...out.wiped]);
-    const defended = [...st.surge.warned].filter((id) => gone.has(id));
+    const defended = st.surge ? [...st.surge.warned].filter((id) => gone.has(id)) : [];
     defended.forEach((id) => { st.surge.warned.delete(id); st.surge.bombs.delete(id); });
     const points = out.points + defended.length * DEMO.defendBonus;
+    const bonus = mode === 'blitz' ? DEMO.blitzBonus(out.length) : 0;
+    if (bonus) st.time += bonus;
 
     st.streak = count; st.windowEnd = now + STREAK_WINDOW_MS;
     st.score += points; st.moves += 1;
-    const previousBest = best;
+    const previousBest = best[mode];
     paint();
     showFeedback('');
     els.feedback.dataset.live = '';
-    await board.play(out, { pop: { text: `+${points}`, combo: count >= 2 } });
+    await board.play(out, { pop: { text: bonus ? `+${points}  +${bonus}s` : `+${points}`, combo: count >= 2 } });
     if (st !== run || st.status === 'over') return;   // restarted or finished while the chain was clearing
     st.grid = out.next;
     if (st.goldDebt) { const d = st.goldDebt; st.goldDebt = 0; applyGold(d); }
@@ -297,7 +363,13 @@ if (host) {
     if (!st.celebrated && previousBest > 0 && st.score > previousBest) { st.celebrated = true; flashFeedback('NEW BEST ✦', 'var(--combo)', 2200); }
     if (st.surgeDue && st.status === 'playing') { doSurge(); return; }
     if (st.status !== 'playing') return;
-    if (!hasMove(st.grid)) { endRun('No chains left'); return; }   // there is no shuffle button, as in the game
+    if (!hasMove(st.grid)) {
+      if (mode === 'blitz') {      // a sprint only ends when the clock does, so a stuck board reshuffles itself
+        st.grid = shuffleColors(st.grid, st.rng);
+        board.setGrid(st.grid, { spawn: false });
+        flashFeedback('No chains left: board reshuffled', 'var(--combo)', 1400);
+      } else { endRun('No chains left'); return; }   // Surge has no shuffle button, as in the game
+    }
     checkTips();
     armIdle();
   }

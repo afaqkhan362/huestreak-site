@@ -16,9 +16,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/tokens.css?v=68e5d285">
-<link rel="stylesheet" href="assets/css/themes.css?v=68e5d285">
-<link rel="stylesheet" href="assets/css/site.css?v=68e5d285">
+<link rel="stylesheet" href="assets/css/tokens.css?v=10a8b43f">
+<link rel="stylesheet" href="assets/css/themes.css?v=10a8b43f">
+<link rel="stylesheet" href="assets/css/site.css?v=10a8b43f">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -41,7 +41,12 @@
 
 <main id="main">
 <section class="play" aria-label="Huestreak, playable demo">
-  <div class="game" id="game">
+  <div class="game" id="game" data-mode="surge">
+    <div class="modes" role="group" aria-label="Mode">
+      <button class="modes__btn" type="button" data-mode="surge" aria-pressed="true">Surge</button>
+      <button class="modes__btn" type="button" data-mode="blitz" aria-pressed="false">Blitz</button>
+    </div>
+
     <div class="game__top">
       <button class="round" id="btn-pause" type="button" aria-label="Pause">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg>
@@ -53,13 +58,17 @@
     </div>
 
     <div class="game__stats">
-      <div><span class="lbl">Best</span><span class="val" id="stat-best">0</span></div>
-      <div><span class="lbl">Score</span><span class="val" id="stat-score">0</span></div>
+      <div><span class="lbl" id="lbl-left">Best</span><span class="val" id="stat-left">0</span></div>
+      <div><span class="lbl" id="lbl-right">Score</span><span class="val" id="stat-right">0</span></div>
     </div>
 
     <div class="surge" id="surge" role="timer" data-level="ok">
       <div class="surge__row"><span class="surge__label" id="surge-label">NEXT SURGE</span><span class="surge__secs" id="surge-secs">20s</span></div>
       <div class="surge__track"><div class="surge__fill" id="surge-fill"></div></div>
+    </div>
+
+    <div class="blitz" id="blitz" data-level="ok" aria-hidden="true">
+      <div class="surge__track"><div class="surge__fill" id="blitz-fill"></div></div>
     </div>
 
     <div class="streak-row"><span class="streak-badge" id="streak" hidden></span></div>
@@ -111,8 +120,8 @@
   </div>
 </footer>
 
-<script type="module" src="assets/js/site.js?v=68e5d285"></script>
-<script type="module" src="assets/js/home.js?v=68e5d285"></script>
-<script type="module" src="assets/js/page.js?v=68e5d285"></script>
+<script type="module" src="assets/js/site.js?v=10a8b43f"></script>
+<script type="module" src="assets/js/home.js?v=10a8b43f"></script>
+<script type="module" src="assets/js/page.js?v=10a8b43f"></script>
 </body>
 </html>

@@ -71,6 +71,7 @@
   --signal-amber: #ffb02e;
   --signal-red: #ff6b6b;
   --signal-blue: #5aa9ff;
+  --signal-green: #4cd964;   /* a full Blitz clock */
 
   /* Motion */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);

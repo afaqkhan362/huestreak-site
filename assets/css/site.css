@@ -232,7 +232,8 @@ a:hover { text-decoration-thickness: 2.5px; }
 .play { display: grid; justify-items: center; padding: var(--s-4) var(--gutter) var(--s-6); }
 .game {
   /* the board takes the height that is left under the header and the HUD, so the whole game fits one screen */
-  --board-w: clamp(240px, min(calc(100svh - var(--header-h) - 410px), calc(100vw - 2 * var(--gutter) - 32px)), 480px);
+  --slack: calc(2 * var(--gutter) + 32px);
+  --board-w: clamp(240px, min(calc(100svh - var(--header-h) - 380px), calc(100vw - var(--slack))), 560px);
   position: relative; width: calc(var(--board-w) + 32px); max-width: 100%;
 }
 .game .board { width: var(--board-w); max-width: none; }
@@ -276,7 +277,7 @@ a:hover { text-decoration-thickness: 2.5px; }
 .game__banner[hidden] { display: none; }
 .game__banner b { font-size: 1.25rem; font-weight: var(--fw-black); letter-spacing: 0.18em; color: var(--signal-amber); }
 .game__banner span { font-size: 0.8125rem; font-weight: var(--fw-bold); }
-.game__foot { display: grid; margin-top: 12px; min-height: 92px; align-items: start; }
+.game__foot { display: grid; margin-top: 12px; min-height: 76px; align-items: start; }
 .game__foot > * { grid-area: 1 / 1; }
 .game__tip {
   display: grid; gap: 2px; align-content: center; padding: 10px 14px; margin-inline: 16px; min-height: 64px;
@@ -299,6 +300,55 @@ a:hover { text-decoration-thickness: 2.5px; }
 .game .board-wrap { container-type: inline-size; }
 @container (max-width: 340px) { .game .board__end p { display: none; } }
 @media (max-width: 380px) { .val { font-size: 1.5rem; } }
+@media (max-width: 600px) { .play { padding-inline: 0; } .game { --slack: 32px; } }   /* phones: the board gets the full width, as in the app */
+
+/* Mode picker (the phone has a menu; the page has these two tabs) */
+.modes { display: flex; gap: 4px; padding: 4px; margin: 0 16px 10px; border-radius: var(--r-pill); background: var(--surface); border: var(--bw) solid var(--border); }
+.modes__btn {
+  flex: 1; font: inherit; font-size: var(--fs-sm); font-weight: var(--fw-black); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+  padding: 0.45rem 0.8rem; min-height: 38px; border-radius: var(--r-pill); border: var(--bw) solid transparent; background: transparent; color: var(--text-muted);
+  transition: background var(--dur-2), color var(--dur-2);
+}
+.modes__btn:hover { color: var(--text); }
+.modes__btn[aria-pressed="true"] { color: var(--text); background: color-mix(in srgb, var(--accent) 26%, transparent); border-color: color-mix(in srgb, var(--accent) 60%, transparent); }
+
+/* Blitz: a plain clock bar where Surge has its board clock */
+.blitz { padding-inline: 24px; min-height: 44px; display: grid; align-content: end; padding-bottom: 8px; }
+.game[data-mode="surge"] .blitz, .game[data-mode="blitz"] .surge { display: none; }
+.blitz[data-level="warn"] .surge__fill { background: var(--signal-amber); }
+.blitz[data-level="urgent"] .surge__fill { background: var(--signal-red); }
+.blitz .surge__fill { background: var(--signal-green); }
+.val[data-hot="true"] { color: var(--signal-red); }
+
+/* Wide screens: the same HUD, moved into panels either side of a much bigger board */
+@media (min-width: 1000px) {
+  .play { padding-block: var(--s-4) var(--s-5); }
+  .game {
+    --panel: 230px; --panel-gap: 32px;
+    --board-w: clamp(320px, min(calc(100svh - var(--header-h) - 150px), calc(100vw - 2 * var(--gutter) - 2 * var(--panel) - 2 * var(--panel-gap))), 760px);
+    width: auto; max-width: none;
+    display: grid; grid-template-columns: var(--panel) var(--board-w) var(--panel); column-gap: var(--panel-gap); align-content: start;
+    grid-template-rows: auto auto auto auto 1fr auto;
+    grid-template-areas: "tabs board right1" "top board right2" "stats board right3" "stats2 board right4" ". board ." ". foot .";
+  }
+  .modes { grid-area: tabs; margin: 0 0 var(--s-3); }
+  .game__top { grid-area: top; padding: 0; gap: var(--s-2); }
+  .game__title { font-size: 0.78rem; letter-spacing: 0.1em; text-align: center; }
+  .game__stats { grid-area: stats; padding: var(--s-4) 4px var(--s-2); }
+  .val { font-size: 2.2rem; }
+  .lbl { font-size: 0.7rem; }
+  .surge, .blitz { grid-area: right1; padding-inline: 0; }
+  .blitz { align-content: center; min-height: 0; padding-bottom: 0; }
+  .streak-row { grid-area: right2; height: 40px; justify-items: start; }
+  .feedback { grid-area: right3; justify-items: start; height: 32px; font-size: 1rem; }
+  .game .board-wrap { grid-area: board; grid-row: 1 / span 5; margin-top: 0; }
+  .game__foot { grid-area: foot; min-height: 64px; }
+  .surge__label { font-size: 0.75rem; }
+  .surge__secs { font-size: 1.5rem; }
+  .surge__track { height: 8px; }
+  .surge__fill { border-radius: 4px; }
+}
+
 
 /* Scripted demos */
 .demo { display: grid; gap: var(--s-3); align-content: start; }
