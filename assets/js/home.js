@@ -6,12 +6,12 @@
 //   Blitz  the tempo: a short clock that starts with your first chain. Chains pay time back, but heat builds with the seconds played and with
 //          how long and fast your chains are: the clock speeds up, chains pay less and a fifth and sixth colour join in.
 // Either run ends with an invitation to download. The numbers here are the demo's own, not the game's tuning.
-import { Board } from './board.js?v=852efd23';
+import { Board } from './board.js?v=b2587d5c';
 import {
   randomGrid, makeIds, mulberry32, applyChain, hasMove, shuffleColors, findHint, streakMultiplier, STREAK_WINDOW_MS, PLAIN_COLORS,
   preloadBoard, chooseMarks, applySurge, tickGold, chainColor,
   tempoStart, tempoChain, tempoTick, tempoLevel, tempoSeconds, tempoColorCount, tempoSpeed, TEMPO,
-} from './engine.js?v=852efd23';
+} from './engine.js?v=b2587d5c';
 
 const $ = (sel) => document.querySelector(sel);
 const host = $('#game-board');

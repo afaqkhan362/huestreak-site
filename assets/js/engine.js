@@ -313,9 +313,9 @@ export function applySurge(grid, marks, bombs, rng, { fuse = 3 } = {}) {
 // cools it toward the floor. Heat drains the clock faster, shrinks what a chain pays back, and brings in a fifth and then a sixth colour.
 // All integers, so it plays the same every time. These numbers are the demo's own, not a promise about the game's.
 export const TEMPO = {
-  startTenths: 160, capTenths: 200, bonus: [8, 12, 17, 23, 30, 38, 46], extraPerTile: 9, streakTenths: 2, streakCap: 5,
-  drainBase: 10, drainPerKiloHeat: 10, fadePerLevel: 60, minPayPerMille: 350, floorPerSecond: 10, floorCap: 600,
-  window: 6, rateRef: 7, skillRise: 6, cool: 6, chainFrom: 5, chainHeat: 8, heatCap: 1000, fiveColorsAt: 200, sixColorsAt: 600,
+  startTenths: 120, capTenths: 150, bonus: [8, 12, 17, 23, 30, 38, 46], extraPerTile: 9, streakTenths: 2, streakCap: 5,
+  drainBase: 10, drainPerKiloHeat: 12, fadePerLevel: 60, minPayPerMille: 350, floorPerSecond: 18, floorCap: 600,
+  window: 6, rateRef: 7, skillRise: 12, cool: 6, chainFrom: 5, chainHeat: 14, heatCap: 1000, fiveColorsAt: 200, sixColorsAt: 600,
 };
 export const tempoStart = () => ({ tenths: TEMPO.startTenths, heat: 0, seconds: 0, avg: 0, pending: 0 });
 export const tempoLevel = (s) => Math.floor(s.heat / 100);
