@@ -20,10 +20,11 @@
   --tile-edge: rgba(255,255,255,0.14);
   --locked-opacity: 0.45;
   --rainbow: #FFFFFF;
-  --tile-1: #E74C3C;
-  --tile-2: #3498DB;
-  --tile-3: #2ECC71;
-  --tile-4: #F1C40F;
-  --tile-5: #9B59B6;
+  --tile-1: #F33D1D;
+  --tile-2: #1073D3;
+  --tile-3: #1BAC6B;
+  --tile-4: #F7E22E;
+  --tile-5: #983879;
+  --tile-6: #40DEFF;
   color-scheme: dark;
 }

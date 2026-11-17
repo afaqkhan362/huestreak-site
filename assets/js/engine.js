@@ -2,7 +2,8 @@
 // No DOM in here, so it can be tested in Node. It shows the idea (chains, bricks, bombs); the numbers are the demo's own, not the game's.
 
 export const MIN_CHAIN = 3;
-export const COLORS = 5;
+export const COLORS = 6;               // the most colours a board can hold (the sixth joins Blitz when it is hot)
+export const PLAIN_COLORS = 5;         // what Surge and the scripted demos use
 export const STREAK_WINDOW_MS = 2500;
 export const RAINBOW_CHAIN = 6;          // a long chain earns a Rainbow tile
 
@@ -305,4 +306,45 @@ export function applySurge(grid, marks, bombs, rng, { fuse = 3 } = {}) {
   let next = shuffleColors(hit, rng);
   for (let i = 0; i < 10 && !hasMove(next); i++) next = shuffleColors(hit, rng);
   return { grid: next, bricked, bombed, stuck: !hasMove(next) };
+}
+
+// ── The Blitz tempo (the demo's own copy of the idea) ────────────────────────
+// A short sprint whose pressure is read from how you play: the seconds played set a floor of heat, long and fast chains add to it, slow play
+// cools it toward the floor. Heat drains the clock faster, shrinks what a chain pays back, and brings in a fifth and then a sixth colour.
+// All integers, so it plays the same every time. These numbers are the demo's own, not a promise about the game's.
+export const TEMPO = {
+  startTenths: 160, capTenths: 200, bonus: [8, 12, 17, 23, 30, 38, 46], extraPerTile: 9, streakTenths: 2, streakCap: 5,
+  drainBase: 10, drainPerKiloHeat: 10, fadePerLevel: 60, minPayPerMille: 350, floorPerSecond: 10, floorCap: 600,
+  window: 6, rateRef: 7, skillRise: 6, cool: 6, chainFrom: 5, chainHeat: 8, heatCap: 1000, fiveColorsAt: 200, sixColorsAt: 600,
+};
+export const tempoStart = () => ({ tenths: TEMPO.startTenths, heat: 0, seconds: 0, avg: 0, pending: 0 });
+export const tempoLevel = (s) => Math.floor(s.heat / 100);
+export const tempoSeconds = (s) => Math.max(0, Math.ceil(s.tenths / 10));
+export const tempoColorCount = (s) => (s.heat >= TEMPO.sixColorsAt ? 6 : s.heat >= TEMPO.fiveColorsAt ? 5 : 4);
+/** How fast the clock runs at this heat, in real seconds per second (1.0 cold). */
+export const tempoSpeed = (s) => (TEMPO.drainBase + Math.floor((s.heat * TEMPO.drainPerKiloHeat) / 1000)) / 10;
+
+/** A chain of `len` tiles, the `streak`-th in a row. Returns the new state and the tenths of a second it paid back. */
+export function tempoChain(s, len, streak) {
+  const t = TEMPO;
+  const table = len <= 2 ? 0 : len - 3 < t.bonus.length ? t.bonus[len - 3] : t.bonus[t.bonus.length - 1] + (len - 2 - t.bonus.length) * t.extraPerTile;
+  const base = table + Math.min(Math.max(0, streak - 1), t.streakCap) * t.streakTenths;
+  const pay = Math.max(t.minPayPerMille, 1000 - Math.floor(s.heat / 100) * t.fadePerLevel);
+  const paid = Math.floor((base * pay) / 1000);
+  const heat = Math.min(t.heatCap, s.heat + Math.max(0, len - t.chainFrom) * t.chainHeat);
+  return { state: { ...s, tenths: Math.min(t.capTenths, s.tenths + paid), heat, pending: s.pending + base }, paidTenths: paid };
+}
+
+/** One real second passed. */
+export function tempoTick(s) {
+  const t = TEMPO;
+  const drain = t.drainBase + Math.floor((s.heat * t.drainPerKiloHeat) / 1000);
+  const avg = s.avg - Math.floor(s.avg / t.window) + s.pending;
+  const rate = Math.floor(avg / t.window);
+  const seconds = s.seconds + 1;
+  const floor = Math.min(t.floorCap, seconds * t.floorPerSecond);
+  let heat = s.heat;
+  if (rate > t.rateRef) heat += Math.floor(((rate - t.rateRef) * t.skillRise) / 10); else heat -= t.cool;
+  heat = Math.min(t.heatCap, Math.max(floor, heat));
+  return { ...s, tenths: s.tenths - drain, heat, seconds, avg, pending: 0 };
 }
