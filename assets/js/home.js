@@ -6,12 +6,12 @@
 //   Blitz  the tempo: a short clock that starts with your first chain. Chains pay time back, but heat builds with the seconds played and with
 //          how long and fast your chains are: the clock speeds up, chains pay less and a fifth and sixth colour join in.
 // Either run ends with an invitation to download. The numbers here are the demo's own, not the game's tuning.
-import { Board } from './board.js?v=0bdc63bf';
+import { Board } from './board.js?v=69b6d84f';
 import {
   randomGrid, makeIds, mulberry32, applyChain, hasMove, shuffleColors, findHint, streakMultiplier, STREAK_WINDOW_MS, PLAIN_COLORS,
   preloadBoard, chooseMarks, applySurge, tickGold, chainColor,
   tempoStart, tempoChain, tempoTick, tempoLevel, tempoSeconds, tempoColorCount, tempoSpeed, TEMPO,
-} from './engine.js?v=0bdc63bf';
+} from './engine.js?v=69b6d84f';
 
 const $ = (sel) => document.querySelector(sel);
 const host = $('#game-board');
@@ -21,11 +21,15 @@ const DEMO = {
   shrinkSeconds: 2,        // each surge comes a little sooner
   minSeconds: 10,
   surges: 3,               // the demo ends when this surge hits
+  maxMoves: 8,             // the page is a taste, not the game: a few moves, then an invitation to get the real thing
   marksBase: 3,            // tiles marked by the first surge, one more each time
   bombEvery: 2,            // every this-many surges one mark is a hazard bomb
   goldSeconds: 16,
   defendBonus: 5,          // points for chaining a marked tile before the surge
 };
+// The demo is a taste: a few moves. (Only on a local server can a test lift the cap, with ?demoMoves=999.)
+const LOCAL = ['127.0.0.1', 'localhost'].includes(location.hostname);
+const MAX_MOVES = LOCAL && Number(new URLSearchParams(location.search).get('demoMoves')) > 0 ? Number(new URLSearchParams(location.search).get('demoMoves')) : DEMO.maxMoves;
 const MODES = {
   surge: { title: 'Surge · Easy', name: 'Surge', blurb: 'Each surge reshuffles the board. Chain marked tiles to save them.' },
   blitz: { title: 'Blitz', name: 'Blitz', blurb: 'A short clock. Long, fast chains earn time but heat it up.' },
@@ -100,6 +104,8 @@ if (host) {
   function liveStreak() { return st && Date.now() <= st.windowEnd ? st.streak : 0; }
 
   function paint() {
+    const note = $('#demo-note');
+    if (note && st.status === 'playing') { const left = Math.max(0, MAX_MOVES - st.moves); note.textContent = `Demo: ${left} ${left === 1 ? 'move' : 'moves'} left. The full game has no limit.`; }
     if (mode === 'blitz') {      // like the phone: score on the left, time on the right
       els.lblLeft.textContent = 'Score'; els.left.textContent = st.score.toLocaleString();
       els.lblRight.textContent = 'Time'; els.right.textContent = clockText(tempoSeconds(st.tempo));
@@ -256,18 +262,18 @@ if (host) {
     paintClock();
     const score = st.score.toLocaleString();
     const taste = mode === 'blitz'
-      ? 'That is a taste of Blitz. The full game adds Surge, a new Daily board every day and global leaderboards.'
-      : 'That is a taste of Surge. The full game adds Blitz, a new Daily board every day and global leaderboards.';
+      ? 'That was a taste of Blitz. The real game keeps going: the heat builds, bombs and new colours join, and you chase a score on the leaderboard.'
+      : 'That was a taste of Surge. The real game keeps going: every surge reshuffles the board, bricks and bombs close in, and you chase a score on the leaderboard.';
     setTimeout(() => {
       if (!st || st.status !== 'over') return;
       hideBanner(); hideTip();
       showOverlay(`<span class="label">${reason}</span><span class="score" id="end-title">${score}</span>
         <p>${taste}</p>
         <div class="actions actions--col">
-          <button class="btn" type="button" data-act="restart">Play again</button>
-          <button class="btn btn--ghost" type="button" data-act="menu">Menu</button>
+          <a class="btn" href="duel.html">See live duels</a>
           <div class="stores"><span class="btn btn--ghost btn--sm" aria-disabled="true">App Store</span><span class="btn btn--ghost btn--sm" aria-disabled="true">Google Play</span></div>
-          <span class="soon">Both coming soon</span>
+          <span class="soon">Coming soon to iPhone, iPad and Android</span>
+          <button class="btn btn--ghost btn--sm" type="button" data-act="restart">Replay the demo</button>
         </div>`, '[data-act="restart"]');
     }, reason === 'Run over' ? 1500 : 400);
   }
@@ -388,6 +394,7 @@ if (host) {
     await board.play(out, { pop: { text: `+${points}${bonusText}`, combo: count >= 2 } });
     if (st !== run || st.status === 'over') return;   // restarted or finished while the chain was clearing
     st.grid = out.next;
+    if (st.moves >= MAX_MOVES) { endRun('Demo complete'); return; }       // a few moves, then the invitation
     if (st.goldDebt) { const d = st.goldDebt; st.goldDebt = 0; applyGold(d); }
     paint();
     if (!st.celebrated && previousBest > 0 && st.score > previousBest) { st.celebrated = true; flashFeedback('NEW BEST ✦', 'var(--combo)', 2200); }
