@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://huestreak.com/blitz</loc></url>
+  <url><loc>https://huestreak.com/daily</loc></url>
   <url><loc>https://huestreak.com/delete-account</loc></url>
+  <url><loc>https://huestreak.com/duel</loc></url>
   <url><loc>https://huestreak.com/gameplay</loc></url>
+  <url><loc>https://huestreak.com/games</loc></url>
   <url><loc>https://huestreak.com/</loc></url>
   <url><loc>https://huestreak.com/privacy</loc></url>
+  <url><loc>https://huestreak.com/ranked</loc></url>
   <url><loc>https://huestreak.com/support</loc></url>
+  <url><loc>https://huestreak.com/surge</loc></url>
   <url><loc>https://huestreak.com/terms</loc></url>
 </urlset>

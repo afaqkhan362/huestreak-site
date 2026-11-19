@@ -5,7 +5,7 @@
 // A trailing * marks a tile for the next surge (amber ring), e.g. R*.
 // Steps: { scene }  { wait }  { drag: [[row, col], ...], release? }  { release }  { tick: seconds }  { shuffleTo: rows }  { surge: true }   each with a caption.
 
-import { gridFromRows, makeIds, applyChain, tickGold, canExtend, hasMove, shuffleColors, mulberry32 } from './engine.js?v=b2587d5c';
+import { gridFromRows, makeIds, applyChain, tickGold, canExtend, hasMove, shuffleColors, mulberry32 } from './engine.js?v=0bdc63bf';
 
 const COLOR = { R: 1, B: 2, G: 3, Y: 4, P: 5 };
 

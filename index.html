@@ -4,21 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Huestreak · Chain Color Puzzle</title>
-<meta name="description" content="Play a Huestreak demo right here: drag across matching tiles, beat the surge clock and build a streak. The full game is coming soon to iPhone, iPad and Android.">
+<meta name="description" content="Huestreak is a chain color puzzle for iPhone, iPad and Android: drag across matching colours, beat the clock in Surge and Blitz, take on the Daily, race friends in live 60-second duels and climb the ranked ladder. Try a demo right here.">
 <link rel="canonical" href="https://huestreak.com/">
 <meta name="theme-color" content="#0b0b18">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Huestreak">
 <meta property="og:title" content="Huestreak · Chain Color Puzzle">
-<meta property="og:description" content="Play a Huestreak demo right here: drag across matching tiles, beat the surge clock and build a streak. The full game is coming soon to iPhone, iPad and Android.">
+<meta property="og:description" content="Huestreak is a chain color puzzle for iPhone, iPad and Android: drag across matching colours, beat the clock in Surge and Blitz, take on the Daily, race friends in live 60-second duels and climb the ranked ladder. Try a demo right here.">
 <meta property="og:url" content="https://huestreak.com/">
 <meta property="og:image" content="https://huestreak.com/assets/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="preload" href="assets/fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/tokens.css?v=b2587d5c">
-<link rel="stylesheet" href="assets/css/themes.css?v=b2587d5c">
-<link rel="stylesheet" href="assets/css/site.css?v=b2587d5c">
+<link rel="preload" href="assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/bricolage-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/tokens.css?v=0bdc63bf">
+<link rel="stylesheet" href="assets/css/themes.css?v=0bdc63bf">
+<link rel="stylesheet" href="assets/css/site.css?v=0bdc63bf">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -29,8 +30,11 @@
       Huestreak
     </a>
     <nav class="nav" id="nav" aria-label="Main">
-      <a href="index.html" aria-current="page">Play</a>
-      <a href="gameplay.html">Gameplay</a>
+      <a href="index.html" aria-current="page">Home</a>
+      <a href="games.html">Games</a>
+      <a href="duel.html">Duel</a>
+      <a href="ranked.html">Ranked</a>
+      <a href="gameplay.html">How to play</a>
       <a href="support.html">Support</a>
     </nav>
     <button class="btn btn--ghost btn--icon nav-toggle" type="button" aria-expanded="false" aria-controls="nav" aria-label="Open the menu">
@@ -40,13 +44,76 @@
 </header>
 
 <main id="main">
-<section class="play" aria-label="Huestreak, playable demo">
+<section class="hero">
+  <div class="container hero__grid">
+    <div>
+      <span class="eyebrow">Chain color puzzle</span>
+      <h1>Chain the hues. <em>Keep the streak.</em></h1>
+      <p class="lead">Drag across matching colours, clear long chains and race a board that pushes back. Quick solo modes for a break, live 60-second duels with friends, and a ranked ladder for when you want to prove it.</p>
+      <div class="cta-row"><a class="btn" href="#try">Play the demo</a><a class="btn btn--ghost" href="duel.html">Watch a live duel</a></div>
+      <div class="cta-row"><span class="store-chip"><span><small>Coming soon</small>iPhone and iPad</span></span><span class="store-chip"><span><small>Coming soon</small>Android</span></span></div>
+    </div>
+    <div class="hero__media"><figure class="phone"><video autoplay muted loop playsinline preload="metadata" poster="assets/media/surge.jpg" width="540" height="1174" aria-label="The Surge mode: a player chains tiles while the board clock counts down"><source src="assets/media/surge.mp4" type="video/mp4"></video></figure></div>
+  </div>
+  <div class="container" style="margin-top: var(--s-8)"><div class="spectrum" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+</section>
+
+<section class="band">
+  <div class="container">
+    <div class="section__head"><span class="eyebrow">Three ways to play</span><h2>A quick break, a sprint, a daily puzzle</h2><p>Every mode is the same simple gesture with a different kind of pressure.</p></div>
+    <div class="grid">
+      <a class="mode-card" href="surge.html"><span class="tag">Main mode</span><h3>Surge</h3><p>A board clock counts down. When it hits zero every colour reshuffles, and the tiles you did not save turn to bricks.</p><figure class="phone phone--sm"><img src="assets/media/surge-board.jpg" width="600" height="1304" alt="The Surge board with marked tiles, bricks and a Rainbow tile" loading="lazy"></figure></a>
+      <a class="mode-card" href="blitz.html"><span class="tag">Sprint</span><h3>Blitz</h3><p>A short clock that you refill with every chain. The longer you last, the hotter it gets.</p><figure class="phone phone--sm"><img src="assets/media/blitz-board.jpg" width="600" height="1304" alt="The Blitz board with the heat meter" loading="lazy"></figure></a>
+      <a class="mode-card" href="daily.html"><span class="tag">Once a day</span><h3>Daily</h3><p>One board for everyone, one attempt, hazards that land on the same move for all. See where you rank.</p><figure class="phone phone--sm"><img src="assets/media/daily-board.jpg" width="600" height="1304" alt="The Daily board with a hazard warning" loading="lazy"></figure></a>
+    </div>
+  </div>
+</section>
+
+<section class="band band--alt">
+  <div class="container split">
+    <div>
+      <span class="eyebrow">Live duels</span>
+      <h2>Same board. Sixty seconds. Send them trouble.</h2>
+      <p>Race a friend, or anyone online, on the exact same board. Long chains and streaks earn weapons you can send straight to the other player's board.</p>
+      <ul class="checks"><li><span><b>Fair by design.</b> Both players start on the same board and a server referee checks every move.</span></li><li><span><b>Earn weapons.</b> Cracked bricks, bricks, bombs, shuffles and freezes.</span></li><li><span><b>Earn trophies.</b> Win, and play well, to climb.</span></li></ul>
+      <div class="cta-row"><a class="btn" href="duel.html">How duels work</a></div>
+    </div>
+    <div class="split__media"><figure class="phone"><video autoplay muted loop playsinline preload="metadata" poster="assets/media/duel.jpg" width="540" height="1174" aria-label="A live duel: both players chain tiles and weapons land as bricks on the board"><source src="assets/media/duel.mp4" type="video/mp4"></video></figure></div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="container split split--flip">
+    <div>
+      <span class="eyebrow">Ranked</span>
+      <h2>Climb from Spark to Spectrum</h2>
+      <p>Seasons last four weeks. Play your placement matches, find your tier and chase the next step. Ranked is earned: win live duels to earn trophies and unlock it.</p>
+      <div class="cta-row"><a class="btn btn--ghost" href="ranked.html">See the ladder</a></div>
+    </div>
+    <div class="split__media"><figure class="phone"><img src="assets/media/ranked.jpg" width="600" height="1304" alt="The Ranked screen with a placement progress ring and the season rewards" loading="lazy"></figure></div>
+  </div>
+</section>
+
+<section class="band band--alt">
+  <div class="container">
+    <div class="section__head"><span class="eyebrow">Fair and calm</span><h2>Built so you can trust the score</h2></div>
+    <div class="grid">
+      <div class="card"><h3>Every score is checked</h3><p>Each game is replayed by the server with the same rules, so a leaderboard score is a score somebody really earned.</p></div>
+      <div class="card"><h3>No ads. Ever.</h3><p>No pop-ups between games, no timers that nag you to come back, no tracking cookies on this site.</p></div>
+      <div class="card"><h3>Readable on purpose</h3><p>Every tile can be told apart at a glance, with optional symbols on each colour, and a reduce-motion setting for calmer clears.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band try" id="try">
+  <div class="container"><div class="section__head"><span class="eyebrow">Try it</span><h2>Play a demo right here</h2><p>A short run of Surge or Blitz, the same rules as the game. Drag across touching tiles of one colour.</p></div></div>
+  <section class="play" aria-label="Huestreak, playable demo">
   <div class="game" id="game" data-mode="surge" data-screen="menu">
     <div class="game__top">
       <button class="round" id="btn-pause" type="button" aria-label="Pause">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg>
       </button>
-      <h1 class="game__title">Surge · Easy</h1>
+      <h2 class="game__title">Surge · Easy</h2>
       <button class="round" id="btn-restart" type="button" aria-label="Restart">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></svg>
       </button>
@@ -82,6 +149,13 @@
     </div>
   </div>
 </section>
+
+</section>
+
+<section class="cta-band">
+  <div class="container"><h2>Coming soon to iPhone, iPad and Android</h2><p>Huestreak is in its final stretch. Questions or feedback? We read every message.</p>
+  <div class="cta-row"><span class="store-chip"><span><small>Coming soon</small>iPhone and iPad</span></span><span class="store-chip"><span><small>Coming soon</small>Android</span></span><a class="btn btn--ghost" href="support.html">Contact support</a></div></div>
+</section>
 </main>
 <footer class="site-footer">
   <div class="container">
@@ -96,7 +170,13 @@
       <div>
         <h4>The game</h4>
         <ul>
-          <li><a href="gameplay.html">Gameplay</a></li>
+          <li><a href="games.html">Games</a></li>
+          <li><a href="surge.html">Surge</a></li>
+          <li><a href="blitz.html">Blitz</a></li>
+          <li><a href="daily.html">Daily</a></li>
+          <li><a href="duel.html">Live duels</a></li>
+          <li><a href="ranked.html">Ranked</a></li>
+          <li><a href="gameplay.html">How to play</a></li>
         </ul>
       </div>
       <div>
@@ -116,8 +196,7 @@
   </div>
 </footer>
 
-<script type="module" src="assets/js/site.js?v=b2587d5c"></script>
-<script type="module" src="assets/js/home.js?v=b2587d5c"></script>
-<script type="module" src="assets/js/page.js?v=b2587d5c"></script>
+<script type="module" src="assets/js/site.js?v=0bdc63bf"></script>
+<script type="module" src="assets/js/home.js?v=0bdc63bf"></script>
 </body>
 </html>

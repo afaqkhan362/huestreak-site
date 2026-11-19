@@ -5,20 +5,28 @@
 */
 
 @font-face {
-  font-family: "Nunito";
-  src: url("../fonts/nunito-latin.woff2") format("woff2");
-  font-weight: 400 900;
+  font-family: "Inter";
+  src: url("../fonts/inter-latin.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("../fonts/bricolage-latin.woff2") format("woff2");
+  font-weight: 200 800;
   font-style: normal;
   font-display: swap;
 }
 
 :root {
   /* Typography */
-  --font: "Nunito", ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
   --fw-regular: 400;
   --fw-semibold: 600;
-  --fw-bold: 800;
-  --fw-black: 900;
+  --fw-bold: 700;
+  --fw-black: 800;
 
   --fs-xs: 0.75rem;
   --fs-sm: 0.875rem;
@@ -31,7 +39,7 @@
   --lh-tight: 1.08;
   --lh-snug: 1.3;
   --lh-body: 1.65;
-  --tracking-tight: -0.03em;
+  --tracking-tight: -0.035em;
   --tracking-eyebrow: 0.16em;
 
   /* Spacing (4px base) */
@@ -46,16 +54,16 @@
   --s-9: 7rem;
 
   /* Shape */
-  --r-sm: 10px;
-  --r-md: 16px;
+  --r-sm: 11px;
+  --r-md: 18px;
   --r-lg: 22px;
   --r-xl: 28px;
   --r-pill: 999px;
-  --bw: 1.5px;
+  --bw: 1px;
   --gutter: clamp(1rem, 4vw, 2rem);
 
   /* Layout */
-  --container: 1120px;
+  --container: 1160px;
   --measure: 68ch;
   --header-h: 68px;
 
